@@ -3,13 +3,14 @@ using System.Collections;
 
 public class Polygon : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-	
+	[HideInInspector]
+	public Vector3	direction;
+	[HideInInspector]
+	public float	speed;
+
+	void OnBecameInvisible()
+	{
+		GameObject.Destroy(gameObject);
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+
 }
