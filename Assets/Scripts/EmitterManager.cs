@@ -6,7 +6,6 @@ public class EmitterManager {
 	PolygonEmitter					e;
 	int								currentSpawnPattern = 0;
 	int								currentPatternCount = 0;
-	List< Polygon >					emittedPolygons = new List< Polygon >();
 
 	public void LoadEmitter (PolygonEmitterObject emitter) {
 		e = emitter.emitter;
@@ -27,8 +26,6 @@ public class EmitterManager {
 			currentSpawnPattern = 0;
 			currentPatternCount = 0;
 		}
-		foreach (var p in e.polygonSpawnPattern[currentSpawnPattern].InstanciateFramePolygons())
-			emittedPolygons.Add(p);
 		if (e.polygonSpawnPattern[currentSpawnPattern].isFinished())
 		{
 			if (currentPatternCount == e.repeatBeforeTransition[currentSpawnPattern] - 1)
@@ -38,20 +35,6 @@ public class EmitterManager {
 			}
 			else
 				currentPatternCount++;
-		}
-
-		//update polygons infos (position, color, ...)
-		for (int i = 0; i < emittedPolygons.Count; i++)
-		{
-			var p = emittedPolygons[i];
-			if (p == null)
-			{
-				emittedPolygons.RemoveAt(i);
-				i--; //stay at the same index
-				continue ;
-			}
-
-			p.transform.position += p.direction * p.speed;
 		}
 	}
 }
