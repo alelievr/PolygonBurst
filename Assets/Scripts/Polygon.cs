@@ -1,42 +1,71 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Polygon : MonoBehaviour {
+[System.Serializable]
+public class Polygon {
 
+	//non edior stats:
 	[HideInInspector]
 	public Vector3			direction;
+
+	//Color datas:
 	[HideInInspector]
-	public AnimationCurve	speedOverLifetime;
-	public Gradient			colorOverLifetime;
+	public EVOLUTION		colorEvolution;
+	[HideInInspector]
+	public Gradient			colorGradient;
+	[HideInInspector]
+	public Color			color;
+
+	//speed datas:
+	[HideInInspector]
+	public Vector2			speedRandoms; //for constant speed, only x is used
+	[HideInInspector]
+	public AnimationCurve	speedCurve;
+
+	//speed modifier on lifetime ?
+
+	//spawn pattern:
+	public SPAWN_PATTERN	spawnPattern;
+	public float			spawnPatternSize;
+	public int				spawnPatternRepeat;
+
+	//direction modifier:
+	public DIRECTION_MODIFIER	directionModifiers;
+	public Vector2				directionRandom;
+	public Vector2				directionCurveX;
+	public Vector2				directionCurveY;
+
+	[HideInInspector]
 	public float			scale = 1;
+	[HideInInspector]
 	public float			timeScale = 1;
 
-	new SpriteRenderer		renderer;
-	float					lifetime;
-
-	void OnEnable()
+	public enum EVOLUTION
 	{
-		renderer = GetComponent< SpriteRenderer >();
-		lifetime = 0;
+		RANDOM_BETWEEN,
+		CURVE_ON_LIFETIME,
+		CURVE_ON_SPEED,
+		CONSTANT
 	}
 
-	void OnBecameInvisible()
+	public enum DIRECTION
 	{
-		enabled = false;
-		GameObject.Destroy(gameObject);
+		VECTOR,
+		PLAYER,
 	}
 
-	void Start()
+	public enum DIRECTION_MODIFIER
 	{
-		transform.localScale = Vector3.one * scale;
-		Update();
+		NONE,			//forward
+		SELF_GUIDEN,	//folow player until reaches screen
+		RANDOM_BETWEEN,	//random angles
+		CURVED,			//folow a curve (IMPORTANT: curve must be in repeat mode !)
 	}
 
-	void Update()
+	public enum SPAWN_PATTERN
 	{
-		transform.position += direction * speedOverLifetime.Evaluate(lifetime);
-		renderer.color = colorOverLifetime.Evaluate(lifetime);
-		lifetime += 0.07f * timeScale;
-	}
+		CIRCLE,
+		LINE,
 
+	}
 }
