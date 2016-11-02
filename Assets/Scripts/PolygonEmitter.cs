@@ -1,15 +1,25 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-[System.SerializableAttribute]
-public class PolygonEmitter {
+[CreateAssetMenu(fileName = "PolygonEmitter")]
+public class PolygonEmitter : ScriptableObject {
 
-	public string						name;
+	public new string					name;
 	public float						life;
 	public float						spwanAt;
 	//emitter loop over spawn patterns and once finished restart until death.
-	public List< PolygonSpawnPattern >	polygonSpawnPattern = new List< PolygonSpawnPattern >();
-	public List< int >					repeatBeforeTransition = new List< int >();
-	public List< float >				transitionDelay = new List< float >();
+	public List< PolygonPatternTransition >	patterns = new List< PolygonPatternTransition >();
+	
+	[System.Serializable]
+	public class PolygonPatternTransition
+	{
+		public PolygonSpawnPattern		spawnPattern;
+		public int						repeat;
+		public float					delay;
 
+		public PolygonPatternTransition()
+		{
+			repeat = 1;
+		}
+	};
 }

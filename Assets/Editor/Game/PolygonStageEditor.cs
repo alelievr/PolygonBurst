@@ -26,7 +26,7 @@ public class PolygonStageEditor : Editor {
 			{
 				//get the PolygonEmitter element:
 				var element = emitterList.serializedProperty.GetArrayElementAtIndex(index);
-				PolygonEmitterObject peo = element.objectReferenceValue as System.Object as PolygonEmitterObject;
+				PolygonEmitter peo = element.objectReferenceValue as System.Object as PolygonEmitter;
 
 				rect.y += 2;
 				EditorGUI.PropertyField(
@@ -39,7 +39,7 @@ public class PolygonStageEditor : Editor {
 				while (stage.transitionDelay.Count < stage.emitters.Count)
 					stage.transitionDelay.Add(0);
 				
-				if (peo != null && peo.emitter != null && stage.transitionDelay.Count > index)
+				if (peo != null && stage.transitionDelay.Count > index)
 				{
 					stage.transitionDelay[index] = EditorGUI.FloatField(
 						new Rect(rect.x + 320, rect.y, 60, EditorGUIUtility.singleLineHeight),
@@ -48,12 +48,12 @@ public class PolygonStageEditor : Editor {
 				}
 			};
 		emitterList.onSelectCallback = (ReorderableList l) => {  
-			var prefab = l.serializedProperty.GetArrayElementAtIndex(l.index).objectReferenceValue as System.Object as PolygonEmitterObject;
+			var prefab = l.serializedProperty.GetArrayElementAtIndex(l.index).objectReferenceValue as System.Object as PolygonEmitter;
 			if (prefab)
 				EditorGUIUtility.PingObject(prefab);
 		};
 		emitterList.onRemoveCallback = (ReorderableList l) => {  
-			if (l.serializedProperty.GetArrayElementAtIndex(l.index).objectReferenceValue as System.Object as PolygonEmitterObject != null)
+			if (l.serializedProperty.GetArrayElementAtIndex(l.index).objectReferenceValue as System.Object as PolygonEmitter != null)
 				ReorderableList.defaultBehaviours.DoRemoveButton(l);
 			ReorderableList.defaultBehaviours.DoRemoveButton(l);
 		};

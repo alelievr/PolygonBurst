@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 public class EmitterManager {
 
-	PolygonEmitter					e;
+	PolygonEmitter			e;
 	int								currentSpawnPattern = 0;
 	int								currentPatternCount = 0;
 
-	public void LoadEmitter (PolygonEmitterObject emitter) {
-		e = emitter.emitter;
+	public void LoadEmitter (PolygonEmitter emitter) {
+		e = emitter;
 	}
 
 	public bool isFinished()
@@ -19,16 +19,16 @@ public class EmitterManager {
 	}
 	
 	public void EmitterFrame () {
-		if (e.polygonSpawnPattern.Count == 0)
+		if (e.patterns.Count == 0)
 			return ;
-		if (currentSpawnPattern == e.polygonSpawnPattern.Count)
+		if (currentSpawnPattern == e.patterns.Count)
 		{
 			currentSpawnPattern = 0;
 			currentPatternCount = 0;
 		}
-		if (e.polygonSpawnPattern[currentSpawnPattern].isFinished())
+		if (e.patterns[currentSpawnPattern].spawnPattern.isFinished())
 		{
-			if (currentPatternCount == e.repeatBeforeTransition[currentSpawnPattern] - 1)
+			if (currentPatternCount == e.patterns[currentSpawnPattern].repeat - 1)
 			{
 				currentSpawnPattern++;
 				currentPatternCount = 0;

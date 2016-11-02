@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class PolygonStage : ScriptableObject {
 
 	public new string					name;
-	public List< PolygonEmitterObject >	emitters = new List< PolygonEmitterObject >();
+	public List< PolygonEmitter >		emitters = new List< PolygonEmitter >();
 	//TOOD: maybe StageTransitionHere? -> renamed in Transition
 	public List< float >				transitionDelay = new List< float >();
 

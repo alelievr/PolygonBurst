@@ -5,7 +5,7 @@ using System.Collections;
 [CustomEditor(typeof(PolygonSpawnPattern))]
 public class PolygonSpawnPatternEditor : Editor {
 
-	public PolygonSpawnPattern spawnPattern = null;
+	public PolygonSpawnPattern	spawnPattern = null;
 
 	void OnEnable()
 	{

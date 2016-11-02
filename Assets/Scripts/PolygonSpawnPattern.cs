@@ -14,9 +14,7 @@ public class PolygonSpawnPattern : ScriptableObject {
 	[Space]
 	//Polygon property
 	public Vector3					direction;
-	public AnimationCurve			speedOverLifeTime;
-	public Gradient					colorOverLifeTime;
-	public float					scale = 1;
+	public Polygon					poly;
 
 	[Space]
 	//Other:
@@ -44,13 +42,9 @@ public class PolygonSpawnPattern : ScriptableObject {
 		if (spawnableObjects.Length != 0)
 		{
 			GameObject go = GameObject.Instantiate(spawnableObjects[0], position, Quaternion.Euler(direction)) as GameObject;
-			go.transform.localScale = Vector3.one * scale;
 			Polygon p = go.GetComponent< Polygon >();
-			p.speedOverLifetime = speedOverLifeTime;
-			p.colorOverLifetime = colorOverLifeTime;
-			p.scale = scale;
-			p.timeScale = lifeTimeScale;
-			p.direction = direction.normalized;
+			//setup position, direction, rotation and scale for polygon, other params will be set by polygon script
+			p.direction = direction;
 			spawnedObjectsCount++;
 			lastSpawnedObject = Time.realtimeSinceStartup;
 		}
