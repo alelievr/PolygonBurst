@@ -16,20 +16,18 @@ public class Polygon {
 	//speed datas:
 	public EVOLUTION		speedEvolution = EVOLUTION.CONSTANT;
 	public Vector2			speedRandoms; //for constant speed, only x is used
-	public AnimationCurve	speedCurve;
+	public AnimationCurve	speedCurve = new AnimationCurve();
 
 	//direction modifier:
 	public int					directionModifiers = 1;
 	public Vector2				directionRandom;
-	public AnimationCurve		directionCurveX;
-	public AnimationCurve		directionCurveY;
+	public AnimationCurve		directionCurveX = new AnimationCurve();
+	public AnimationCurve		directionCurveY = new AnimationCurve();
 	public string				directionTargetName;
 
 	public EVOLUTION		scaleEvolution = EVOLUTION.CONSTANT;
 	public Vector2			scale = Vector2.one; //for constant, only x is used
-	public AnimationCurve	scaleCurve;
-
-	//speed modifier on lifetime ?
+	public AnimationCurve	scaleCurve = new AnimationCurve();
 
 	public float			timeScale = 1;
 

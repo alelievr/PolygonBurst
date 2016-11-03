@@ -34,6 +34,7 @@ public class PolygonStageEditor : Editor {
 					element,
 					GUIContent.none
 				);
+				rect.x += 300 + 20;
 				
 				//add missing delay for emitters
 				while (stage.transitionDelay.Count < stage.emitters.Count)
@@ -41,8 +42,13 @@ public class PolygonStageEditor : Editor {
 				
 				if (peo != null && stage.transitionDelay.Count > index)
 				{
+					EditorGUI.LabelField(
+						new Rect(rect.x, rect.y, 90, EditorGUIUtility.singleLineHeight),
+						"transition (ms)"
+					);
+					rect.x += 90 + 20;
 					stage.transitionDelay[index] = EditorGUI.FloatField(
-						new Rect(rect.x + 320, rect.y, 60, EditorGUIUtility.singleLineHeight),
+						new Rect(rect.x, rect.y, 60, EditorGUIUtility.singleLineHeight),
 						stage.transitionDelay[index]
 					);
 				}

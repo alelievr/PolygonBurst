@@ -4,8 +4,8 @@ using System.Collections.Generic;
 public class EmitterManager {
 
 	PolygonEmitter			e;
-	int								currentSpawnPattern = 0;
-	int								currentPatternCount = 0;
+	int						currentSpawnPattern = 0;
+	int						currentPatternCount = 0;
 
 	public void LoadEmitter (PolygonEmitter emitter) {
 		e = emitter;
@@ -13,9 +13,9 @@ public class EmitterManager {
 
 	public bool isFinished()
 	{
-		if (e.life < 0)
+		if (e.life <= 0)
 			Debug.Log("emitter " + e.name + " defeated");
-		return e.life < 0;
+		return e.life <= 0;
 	}
 	
 	public void EmitterFrame () {
@@ -36,5 +36,7 @@ public class EmitterManager {
 			else
 				currentPatternCount++;
 		}
+		else
+			e.patterns[currentSpawnPattern].spawnPattern.InstanciateFramePolygons();
 	}
 }
