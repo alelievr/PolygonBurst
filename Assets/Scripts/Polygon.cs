@@ -5,39 +5,32 @@ using System.Collections;
 public class Polygon {
 
 	//non edior stats:
-	[HideInInspector]
 	public Vector3			direction;
 
 	//Color datas:
-	[HideInInspector]
-	public EVOLUTION		colorEvolution;
-	[HideInInspector]
+	public EVOLUTION		colorEvolution = EVOLUTION.CONSTANT;
 	public Gradient			colorGradient;
-	[HideInInspector]
-	public Color			color;
+	public Color			color1;
+	public Color			color2;
 
 	//speed datas:
-	[HideInInspector]
+	public EVOLUTION		speedEvolution = EVOLUTION.CONSTANT;
 	public Vector2			speedRandoms; //for constant speed, only x is used
-	[HideInInspector]
 	public AnimationCurve	speedCurve;
+
+	//direction modifier:
+	public int					directionModifiers = 1;
+	public Vector2				directionRandom;
+	public AnimationCurve		directionCurveX;
+	public AnimationCurve		directionCurveY;
+	public string				directionTargetName;
+
+	public EVOLUTION		scaleEvolution = EVOLUTION.CONSTANT;
+	public Vector2			scale = Vector2.one; //for constant, only x is used
+	public AnimationCurve	scaleCurve;
 
 	//speed modifier on lifetime ?
 
-	//spawn pattern:
-	public SPAWN_PATTERN	spawnPattern;
-	public float			spawnPatternSize;
-	public int				spawnPatternRepeat;
-
-	//direction modifier:
-	public DIRECTION_MODIFIER	directionModifiers;
-	public Vector2				directionRandom;
-	public Vector2				directionCurveX;
-	public Vector2				directionCurveY;
-
-	[HideInInspector]
-	public float			scale = 1;
-	[HideInInspector]
 	public float			timeScale = 1;
 
 	public enum EVOLUTION
@@ -56,16 +49,8 @@ public class Polygon {
 
 	public enum DIRECTION_MODIFIER
 	{
-		NONE,			//forward
 		SELF_GUIDEN,	//folow player until reaches screen
 		RANDOM_BETWEEN,	//random angles
 		CURVED,			//folow a curve (IMPORTANT: curve must be in repeat mode !)
-	}
-
-	public enum SPAWN_PATTERN
-	{
-		CIRCLE,
-		LINE,
-
 	}
 }

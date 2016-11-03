@@ -10,13 +10,12 @@ public class PlayerController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		projectileSpawnPattern.attachedGameObject = gameObject;
 		projectileSpawnPattern.maxObjects = -1;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		projectileSpawnPattern.direction = transform.up;
-		projectileSpawnPattern.position = transform.position + transform.up * spawnOffset.y;
 		projectileSpawnPattern.InstanciateFramePolygons();
 	}
 

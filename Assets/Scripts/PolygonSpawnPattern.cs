@@ -7,18 +7,27 @@ public class PolygonSpawnPattern : ScriptableObject {
 	//Spawn property
 	[TooltipAttribute("in ms")]
 	public float					spawnDelay = 20; //in ms
-	public int						maxObjects = 20;
-	public GameObject[]				spawnableObjects;
-	public Vector3					position;
+	public int						maxObjects = -1;
+	public List < GameObject >		spawnableObjects = new List< GameObject >();
+
+	//spawn pattern:
+	public SPAWN_PATTERN			spawnPattern;
+	public SPAWN_DISPOSITION		spawnDisposition;
+	public int						objectNumberOnPattern;
+	public float					spawnPatternSize;
+	public List< Vector3 >			spawnPoints = new List< Vector3 >();
 
 	[Space]
 	//Polygon property
-	public Vector3					direction;
 	public Polygon					poly;
 
 	[Space]
 	//Other:
 	public float					lifeTimeScale = 1;
+
+	//attached gameobject to spawn polygons at his position and rotaion
+	public GameObject				attachedGameObject;
+
 
 	//a lot of datas for spawn patterns (complex and simple)
 
@@ -39,12 +48,52 @@ public class PolygonSpawnPattern : ScriptableObject {
 			return ;
 		//called each frame to spawn polygons if needed
 		//iterator over all to-spawn polygons of the frame and returned it once spawned
-		if (spawnableObjects.Length != 0)
+		if (spawnableObjects.Count != 0)
 		{
-			GameObject go = GameObject.Instantiate(spawnableObjects[0], position, Quaternion.Euler(direction)) as GameObject;
-			Polygon p = go.GetComponent< Polygon >();
-			//setup position, direction, rotation and scale for polygon, other params will be set by polygon script
-			p.direction = direction;
+			//spawn pattern algo to generate position and direction:
+			Vector3 direction = Vector3.up;
+			Vector3 position = Vector3.zero;
+			switch (spawnPattern)
+			{
+				default:
+				case SPAWN_PATTERN.ON_CIRCLE:
+					if (spawnDisposition == SPAWN_DISPOSITION.EQUAL)
+					{
+						//circle dispoition with objectNumberOnPattern;
+					}
+					if (spawnDisposition == SPAWN_DISPOSITION.RANDOM)
+					{
+						position = Random.insideUnitCircle.normalized;
+						direction = position;
+						position += attachedGameObject.transform.position;
+					}
+					break ;
+				case SPAWN_PATTERN.IN_CIRCLE:
+					if (spawnDisposition == SPAWN_DISPOSITION.EQUAL)
+					{
+						//circle dispoition with objectNumberOnPattern;
+					}	
+					if (spawnDisposition == SPAWN_DISPOSITION.RANDOM)
+					{
+						position = Random.insideUnitCircle;
+						direction = position.normalized;
+						position += attachedGameObject.transform.position;
+					}
+					break ;
+				case SPAWN_PATTERN.LINE:
+					break ;
+
+				case SPAWN_PATTERN.POINTS:
+					break ;
+			}
+			GameObject go = GameObject.Instantiate(
+				spawnableObjects[0],
+				position,
+				Quaternion.FromToRotation(Vector3.up, direction)
+			) as GameObject;
+			PolygonBehaviour p = go.AddComponent< PolygonBehaviour >();
+			//setup position, direction and rotation for polygon, other params will be set by polygon script
+			p.UpdateParams(direction, poly);
 			spawnedObjectsCount++;
 			lastSpawnedObject = Time.realtimeSinceStartup;
 		}
@@ -56,15 +105,17 @@ public class PolygonSpawnPattern : ScriptableObject {
 		return false;
 	}
 
-	enum DIRECTION {
-		DIRECTIONAL,
-		SPHERICAL,
-	}
-
-	enum SHAPE
+	public enum SPAWN_PATTERN
 	{
-		SQUARE,
-		CIRCLE,
+		ON_CIRCLE,
+		IN_CIRCLE,
+		LINE,
+		POINTS,		//draw with handles
 	}
 
+	public enum SPAWN_DISPOSITION
+	{
+		EQUAL,
+		RANDOM,
+	}
 }
