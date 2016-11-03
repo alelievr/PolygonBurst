@@ -31,24 +31,25 @@ public class Polygon {
 
 	public float			timeScale = 1;
 
-	public enum EVOLUTION
-	{
-		RANDOM_BETWEEN,
-		CURVE_ON_LIFETIME,
-		CURVE_ON_SPEED,
-		CONSTANT
-	}
+}
 
-	public enum DIRECTION
-	{
-		VECTOR,
-		PLAYER,
-	}
+public enum EVOLUTION
+{
+	RANDOM_BETWEEN,
+	CURVE_ON_LIFETIME,
+	CURVE_ON_SPEED,
+	CONSTANT
+}
 
-	public enum DIRECTION_MODIFIER
-	{
-		SELF_GUIDEN,	//folow player until reaches screen
-		RANDOM_BETWEEN,	//random angles
-		CURVED,			//folow a curve (IMPORTANT: curve must be in repeat mode !)
-	}
+public enum DIRECTION
+{
+	VECTOR,
+	PLAYER,
+}
+
+public enum DIRECTION_MODIFIER
+{
+	SELF_GUIDEN,	//folow player until reaches screen
+	RANDOM_BETWEEN,	//random angles
+	CURVED,			//folow a curve (IMPORTANT: curve must be in repeat mode !)
 }

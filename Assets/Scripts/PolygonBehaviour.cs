@@ -45,6 +45,21 @@ public class PolygonBehaviour : MonoBehaviour {
 		//WARNING: DO NOT CHANGE poly ATTRIBUTES VALUES !
 
 		if (direction != Vector3.zero)
-			transform.position += direction * 0.1f;
+			transform.position += direction * speed;
+		if (poly.directionModifiers != 0)
+		{
+
+		}
+
+		//speed evolution:
+		if (poly.speedEvolution == EVOLUTION.CURVE_ON_LIFETIME)
+			speed = poly.speedCurve.Evaluate(lifetime);
+		if (poly.speedEvolution == EVOLUTION.CURVE_ON_SPEED)
+			speed = poly.speedCurve.Evaluate(speed);
+
+		//color evolution:
+		if (poly.colorEvolution == EVOLUTION.CURVE_ON_LIFETIME)
+			renderer.color = poly.colorGradient.Evaluate(lifetime);
+		lifetime += 0.05f * poly.timeScale;
 	}
 }

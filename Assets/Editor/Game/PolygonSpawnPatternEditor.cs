@@ -9,20 +9,8 @@ public class PolygonSpawnPatternEditor : Editor {
 
 	ReorderableList				spawableObjectsList;
 
-	GameObject					parent;
-	PolygonSpawnPatternBehaviour	pspb;
-
 	void OnEnable()
 	{
-		parent = new GameObject("editor-" + this.GetHashCode() % 100);
-		pspb = parent.AddComponent< PolygonSpawnPatternBehaviour >();
-		pspb.spawnPattern = spawnPattern;
-		pspb.editorParent = parent.transform;
-		pspb.editorMode = true;
-
-		parent.transform.position = Vector3.zero;
-		parent.transform.rotation = Quaternion.identity;
-
 		SceneView.onSceneGUIDelegate += OnSceneGUI;
 
 		spawnPattern = (PolygonSpawnPattern)target;
@@ -68,6 +56,7 @@ public class PolygonSpawnPatternEditor : Editor {
 		spawnPattern.spawnDelayBetweenWaves = EditorGUILayout.FloatField("spawn delay between waves", spawnPattern.spawnDelayBetweenWaves);
 		spawnPattern.spawnDelayInsideWaves = EditorGUILayout.FloatField("spawn delay inside waves", spawnPattern.spawnDelayInsideWaves);
 		spawnPattern.maxObjects = EditorGUILayout.IntField("max objects", spawnPattern.maxObjects);
+		spawnPattern.rotation = EditorGUILayout.FloatField("rotation", spawnPattern.rotation);
 
 		EditorGUILayout.Space();
 	}
@@ -76,27 +65,33 @@ public class PolygonSpawnPatternEditor : Editor {
 	{
 		EditorGUILayout.LabelField("Spawn pattern settings", EditorStyles.boldLabel);
 
-		spawnPattern.spawnPattern = (SPAWN_PATTERN)EditorGUILayout.EnumPopup("spawn pattern", spawnPattern.spawnPattern);
-		if (spawnPattern.spawnPattern == SPAWN_PATTERN.POINTS)
+		var pa = spawnPattern.pattern;
+		pa.spawnPattern = (SPAWN_PATTERN)EditorGUILayout.EnumPopup("spawn pattern", pa.spawnPattern);
+		if (pa.spawnPattern == SPAWN_PATTERN.POINTS)
 		{
 			EditorGUI.indentLevel++;
-			for (int i = 0; i < spawnPattern.spawnPoints.Count; i++)
+			int i = 0;
+			foreach (var p in pa.customPoints)
 			{
 				EditorGUILayout.BeginHorizontal();
-				EditorGUILayout.Vector3Field("", spawnPattern.spawnPoints[i]);
+				EditorGUILayout.Vector3Field("", p);
 				if (GUILayout.Button("X", GUILayout.Width(50)))
-					spawnPattern.spawnPoints.RemoveAt(i);
+				{
+					pa.customPoints.RemoveAt(i);
+					break ;
+				}
 				EditorGUILayout.EndHorizontal();
+				i++;
 			}
 			//display points on the editor:
 			EditorGUI.indentLevel--;
 			if (GUILayout.Button("add point", GUILayout.Width(100)))
-				spawnPattern.spawnPoints.Add(Vector3.zero);
+				pa.customPoints.Add(Vector3.up);
 		}
-		spawnPattern.spawnDisposition = (PolygonSpawnPattern.SPAWN_DISPOSITION)EditorGUILayout.EnumPopup("spawn disposition", spawnPattern.spawnDisposition);
-		spawnPattern.spawnObjectsPerWave = EditorGUILayout.IntField("spawned object per waves", spawnPattern.spawnObjectsPerWave);
-		spawnPattern.spawnWaveNumber = EditorGUILayout.IntField("max number of waves", spawnPattern.spawnWaveNumber);
-		spawnPattern.spawnPatternSize = EditorGUILayout.FloatField("spawn pattern size", spawnPattern.spawnPatternSize);
+		pa.spawnDisposition = (SPAWN_DISPOSITION)EditorGUILayout.EnumPopup("spawn disposition", pa.spawnDisposition);
+		pa.spawnObjectPatternCount = EditorGUILayout.IntField("spawned object per waves", pa.spawnObjectPatternCount);
+		pa.spawnPatternSize = EditorGUILayout.FloatField("spawn pattern size", pa.spawnPatternSize);
+		spawnPattern.spawnWavePerCycle= EditorGUILayout.IntField("waves per cycle", spawnPattern.spawnWavePerCycle);
 
 		EditorGUILayout.Space();
 	}
@@ -107,11 +102,11 @@ public class PolygonSpawnPatternEditor : Editor {
 
 		var p = spawnPattern.poly;
 		//color settings:
-		p.colorEvolution = (Polygon.EVOLUTION)EditorGUILayout.EnumPopup("color evolution type", p.colorEvolution);
+		p.colorEvolution = (EVOLUTION)EditorGUILayout.EnumPopup("color evolution type", p.colorEvolution);
 		switch (p.colorEvolution)
 		{
-			case Polygon.EVOLUTION.CURVE_ON_LIFETIME:
-			case Polygon.EVOLUTION.CURVE_ON_SPEED:
+			case EVOLUTION.CURVE_ON_LIFETIME:
+			case EVOLUTION.CURVE_ON_SPEED:
 				var e = serializedObject.FindProperty("poly").FindPropertyRelative("colorGradient");
 				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.PropertyField(e, true, null);
@@ -120,10 +115,10 @@ public class PolygonSpawnPatternEditor : Editor {
 					serializedObject.ApplyModifiedProperties();
 				}
 				break ;
-			case Polygon.EVOLUTION.CONSTANT:
+			case EVOLUTION.CONSTANT:
 				p.color1 = EditorGUILayout.ColorField("color", p.color1);
 				break ;
-			case Polygon.EVOLUTION.RANDOM_BETWEEN:
+			case EVOLUTION.RANDOM_BETWEEN:
 				p.color1 = EditorGUILayout.ColorField("color 1", p.color1);
 				p.color2 = EditorGUILayout.ColorField("color 2", p.color2);
 				break ;
@@ -131,17 +126,17 @@ public class PolygonSpawnPatternEditor : Editor {
 		EditorGUILayout.Space();
 
 		//speed settings:
-		p.speedEvolution = (Polygon.EVOLUTION)EditorGUILayout.EnumPopup("speed evolution type", p.speedEvolution);
+		p.speedEvolution = (EVOLUTION)EditorGUILayout.EnumPopup("speed evolution type", p.speedEvolution);
 		switch (p.speedEvolution)
 		{
-			case Polygon.EVOLUTION.CURVE_ON_LIFETIME:
-			case Polygon.EVOLUTION.CURVE_ON_SPEED:
+			case EVOLUTION.CURVE_ON_LIFETIME:
+			case EVOLUTION.CURVE_ON_SPEED:
 				p.speedCurve = EditorGUILayout.CurveField("speed evolution", p.speedCurve);
 				break ;
-			case Polygon.EVOLUTION.CONSTANT:
+			case EVOLUTION.CONSTANT:
 				p.speedRandoms.x = EditorGUILayout.FloatField("speed", p.speedRandoms.x);
 				break ;
-			case Polygon.EVOLUTION.RANDOM_BETWEEN:
+			case EVOLUTION.RANDOM_BETWEEN:
 				p.speedRandoms = EditorGUILayout.Vector2Field("speed between", p.speedRandoms);
 				break ;
 		}
@@ -151,30 +146,30 @@ public class PolygonSpawnPatternEditor : Editor {
 		p.directionModifiers = EditorGUILayout.MaskField(
 			"direction modifiers",
 			p.directionModifiers,
-			System.Enum.GetNames(typeof(Polygon.DIRECTION_MODIFIER))
+			System.Enum.GetNames(typeof(DIRECTION_MODIFIER))
 		);
-		if ((p.directionModifiers & (1 << (int)Polygon.DIRECTION_MODIFIER.CURVED)) != 0)
+		if ((p.directionModifiers & (1 << (int)DIRECTION_MODIFIER.CURVED)) != 0)
 		{
 			p.directionCurveX = EditorGUILayout.CurveField("x modifier", p.directionCurveX);
 			p.directionCurveY = EditorGUILayout.CurveField("y modifier", p.directionCurveY);
 		}
-		if ((p.directionModifiers & (1 << (int)Polygon.DIRECTION_MODIFIER.SELF_GUIDEN)) != 0)
+		if ((p.directionModifiers & (1 << (int)DIRECTION_MODIFIER.SELF_GUIDEN)) != 0)
 			p.directionTargetName = EditorGUILayout.TextField("target name when insatncied", p.directionTargetName);
-		if ((p.directionModifiers & (1 << (int)Polygon.DIRECTION_MODIFIER.RANDOM_BETWEEN)) != 0)
+		if ((p.directionModifiers & (1 << (int)DIRECTION_MODIFIER.RANDOM_BETWEEN)) != 0)
 			p.directionRandom = EditorGUILayout.Vector2Field("direction random angle bounds", p.directionRandom);
 		EditorGUILayout.Space();
 
-		p.scaleEvolution = (Polygon.EVOLUTION)EditorGUILayout.EnumPopup("scale evolution type", p.scaleEvolution);
+		p.scaleEvolution = (EVOLUTION)EditorGUILayout.EnumPopup("scale evolution type", p.scaleEvolution);
 		switch (p.scaleEvolution)
 		{
-			case Polygon.EVOLUTION.CURVE_ON_LIFETIME:
-			case Polygon.EVOLUTION.CURVE_ON_SPEED:
+			case EVOLUTION.CURVE_ON_LIFETIME:
+			case EVOLUTION.CURVE_ON_SPEED:
 				p.scaleCurve = EditorGUILayout.CurveField("scale curve", p.scaleCurve);
 				break ;
-			case Polygon.EVOLUTION.CONSTANT:
+			case EVOLUTION.CONSTANT:
 				p.scale.x = EditorGUILayout.FloatField("scale", p.scale.x);
 				break ;
-			case Polygon.EVOLUTION.RANDOM_BETWEEN:
+			case EVOLUTION.RANDOM_BETWEEN:
 				p.scale = EditorGUILayout.Vector2Field("scale between", p.scale);
 				break ;
 		}
@@ -203,45 +198,42 @@ public class PolygonSpawnPatternEditor : Editor {
 
 	public void OnSceneGUI(SceneView sv)
 	{
-		if (parent == null)
-			return ;
-		Vector3 pos = parent.transform.position;
-		Quaternion rot = parent.transform.rotation;
+		Vector3 pos = Vector3.zero;
+		Quaternion rot = Quaternion.identity;
 		Handles.color = new Color(0, 1, 0, .3f);
-		Pattern p = new Pattern(spawnPattern.spawnObjectsPerWave, spawnPattern.spawnPattern);
-		switch (spawnPattern.spawnPattern)
+		var pa = spawnPattern.pattern;
+		switch (pa.spawnPattern)
 		{
 			case SPAWN_PATTERN.IN_CIRCLE:
 				//Handles.FreeMoveHandle(pos, rot, spawnPattern.spawnPatternSize, Vector3.zero, Handles.CircleCap);
-				Handles.DrawSolidDisc(pos, Vector3.back, spawnPattern.spawnPatternSize);
-				spawnPattern.spawnPatternSize = Handles.RadiusHandle(rot, pos, spawnPattern.spawnPatternSize, false);
+				Handles.DrawSolidDisc(pos, Vector3.back, pa.spawnPatternSize);
+				pa.spawnPatternSize = Handles.RadiusHandle(rot, pos, pa.spawnPatternSize, false);
 
 				//display with arraws direction taken by polygons
-				foreach (var pi in p.GetNextSpawnInfo())
-				{
-					float eSize = HandleUtility.GetHandleSize(pos) * 0.05f;
-					Handles.ArrowCap(0, pos + pi.position, Quaternion.FromToRotation(Vector3.up, pi.direction), eSize);
-				}
+
 				break ;
 			case SPAWN_PATTERN.ON_CIRCLE:
-				spawnPattern.spawnPatternSize = Handles.RadiusHandle(rot, pos, spawnPattern.spawnPatternSize, false);
+				pa.spawnPatternSize = Handles.RadiusHandle(rot, pos, pa.spawnPatternSize, false);
 				break ;
 			case SPAWN_PATTERN.LINE:
 				break ;
 			case SPAWN_PATTERN.POINTS:
 			Handles.color = Color.green;
 				float size = HandleUtility.GetHandleSize(pos) * 0.05f;
-				for (int i = 0; i < spawnPattern.spawnPoints.Count; i++)
+				for (int i = 0; i < pa.customPoints.Count; i++)
 				{
-					spawnPattern.spawnPoints[i] = Handles.FreeMoveHandle(pos + spawnPattern.spawnPoints[i], rot, size, Vector3.zero, Handles.DotCap) - pos;
+					pa.customPoints[i] = Handles.FreeMoveHandle(pos + pa.customPoints[i], rot, size, Vector3.zero, Handles.DotCap) - pos;
 					//snapping
-					spawnPattern.spawnPoints[i] = Utils.Round(spawnPattern.spawnPoints[i], 1);
+					pa.customPoints[i] = Utils.Round(pa.customPoints[i], 1);
 				}
 				break ;
-			case SPAWN_PATTERN.CURVE:
-				break ;
 		}
-
+		foreach (var pi in spawnPattern.pattern.GetNextSpawnInfo())
+		{
+			float eSize = HandleUtility.GetHandleSize(pos) * 0.5f;
+			Handles.color = Color.red;
+			Handles.ArrowCap(0, pos + pi.position, Quaternion.FromToRotation(Vector3.forward, pi.direction), eSize);
+		}
  /*       Handles.BeginGUI();
 		if (GUILayout.Button("Play", GUILayout.Width(120)))
 			pspb.editorPlay = true;
@@ -252,7 +244,11 @@ public class PolygonSpawnPatternEditor : Editor {
 
 	void OnDisable()
 	{
-		GameObject.DestroyImmediate(parent);
+		SceneView.onSceneGUIDelegate -= OnSceneGUI;
+	}
+
+	~PolygonSpawnPatternEditor()
+	{
 		SceneView.onSceneGUIDelegate -= OnSceneGUI;
 	}
 }
