@@ -111,9 +111,8 @@ public class PolygonSpawnPatternEditor : Editor {
 				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.PropertyField(e, true, null);
 				if(EditorGUI.EndChangeCheck())
-				{
 					serializedObject.ApplyModifiedProperties();
-				}
+				p.colorLoop = EditorGUILayout.Toggle("loop color gradient", p.colorLoop);
 				break ;
 			case EVOLUTION.CONSTANT:
 				p.color1 = EditorGUILayout.ColorField("color", p.color1);
@@ -126,6 +125,7 @@ public class PolygonSpawnPatternEditor : Editor {
 		EditorGUILayout.Space();
 
 		//speed settings:
+		p.speedMultiplier = EditorGUILayout.FloatField("speed multiplier", p.speedMultiplier);
 		p.speedEvolution = (EVOLUTION)EditorGUILayout.EnumPopup("speed evolution type", p.speedEvolution);
 		switch (p.speedEvolution)
 		{
@@ -143,6 +143,7 @@ public class PolygonSpawnPatternEditor : Editor {
 		EditorGUILayout.Space();
 
 		//direction settings:
+		p.directionMaxAngularVelocity = EditorGUILayout.FloatField("max angular velocity", p.directionMaxAngularVelocity);
 		p.directionModifiers = EditorGUILayout.MaskField(
 			"direction modifiers",
 			p.directionModifiers,
@@ -150,8 +151,7 @@ public class PolygonSpawnPatternEditor : Editor {
 		);
 		if ((p.directionModifiers & (1 << (int)DIRECTION_MODIFIER.CURVED)) != 0)
 		{
-			p.directionCurveX = EditorGUILayout.CurveField("x modifier", p.directionCurveX);
-			p.directionCurveY = EditorGUILayout.CurveField("y modifier", p.directionCurveY);
+			p.directionCurve = EditorGUILayout.CurveField("direction modifier", p.directionCurve);
 		}
 		if ((p.directionModifiers & (1 << (int)DIRECTION_MODIFIER.SELF_GUIDEN)) != 0)
 			p.directionTargetName = EditorGUILayout.TextField("target name when insatncied", p.directionTargetName);
@@ -173,6 +173,29 @@ public class PolygonSpawnPatternEditor : Editor {
 				p.scale = EditorGUILayout.Vector2Field("scale between", p.scale);
 				break ;
 		}
+		EditorGUILayout.Space();
+
+		//z position settings:
+		p.zPositionEvolution = (EVOLUTION)EditorGUILayout.EnumPopup("z evolution type", p.zPositionEvolution);
+		switch (p.zPositionEvolution)
+		{
+			case EVOLUTION.CURVE_ON_LIFETIME:
+			case EVOLUTION.CURVE_ON_SPEED:
+				p.zPositionCurve = EditorGUILayout.CurveField("z position curve", p.zPositionCurve);
+				break ;
+			case EVOLUTION.CONSTANT:
+				p.zPosition.x = EditorGUILayout.FloatField("speed", p.zPosition.x);
+				break ;
+			case EVOLUTION.RANDOM_BETWEEN:
+				p.zPosition = EditorGUILayout.Vector2Field("z between", p.zPosition);
+				break ;
+		}
+		EditorGUILayout.Space();
+
+		//oth:
+		p.timeScale = EditorGUILayout.FloatField("time scale multiplier", p.timeScale);
+		p.dontDestroyOnInvisible = EditorGUILayout.Toggle("dont destroy on invisible", p.dontDestroyOnInvisible);
+		p.lifeTime = EditorGUILayout.FloatField("max lifeTime", p.lifeTime);
 	}
 
 	public override void OnInspectorGUI()

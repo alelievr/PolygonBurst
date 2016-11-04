@@ -12,24 +12,34 @@ public class Polygon {
 	public Gradient			colorGradient;
 	public Color			color1;
 	public Color			color2;
+	public bool				colorLoop = false;
 
 	//speed datas:
 	public EVOLUTION		speedEvolution = EVOLUTION.CONSTANT;
 	public Vector2			speedRandoms; //for constant speed, only x is used
 	public AnimationCurve	speedCurve = new AnimationCurve();
+	public float			speedMultiplier = 1;
 
 	//direction modifier:
 	public int					directionModifiers = 1;
+	public float				directionMaxAngularVelocity;
 	public Vector2				directionRandom;
-	public AnimationCurve		directionCurveX = new AnimationCurve();
-	public AnimationCurve		directionCurveY = new AnimationCurve();
+	public AnimationCurve		directionCurve = new AnimationCurve();
 	public string				directionTargetName;
 
+	//scale datas:
 	public EVOLUTION		scaleEvolution = EVOLUTION.CONSTANT;
 	public Vector2			scale = Vector2.one; //for constant, only x is used
 	public AnimationCurve	scaleCurve = new AnimationCurve();
 
+	//z position evolution:
+	public EVOLUTION		zPositionEvolution;
+	public Vector2			zPosition;
+	public AnimationCurve	zPositionCurve;
+
 	public float			timeScale = 1;
+	public bool				dontDestroyOnInvisible = false;
+	public float			lifeTime = -1;
 
 }
 
