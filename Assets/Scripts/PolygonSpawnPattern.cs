@@ -80,7 +80,9 @@ public class PolygonSpawnPattern : ScriptableObject {
 				go.transform.parent = gParent;
 			else
 				go.transform.parent = parent.transform;
-			PolygonBehaviour p = go.AddComponent< PolygonBehaviour >();
+			PolygonBehaviour p = go.GetComponent< PolygonBehaviour >();
+			if (p == null)
+				p = go.AddComponent< PolygonBehaviour >();
 			//setup position, direction and rotation for polygon, other params will be set by polygon script
 			p.UpdateParams(direction, poly);
 			spawnedObjectsCount++;

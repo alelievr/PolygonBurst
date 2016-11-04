@@ -110,8 +110,7 @@ public class PolygonBehaviour : MonoBehaviour {
 			direction = Quaternion.Euler(0, 0, clampedAngle) * direction;
 		}
 
-		float speedRate = (speed - minSpeed) / (minSpeed - maxSpeed);
-		Debug.Log("speedRate: " + speedRate);
+		float speedRate = ((speed * (1 / poly.speedMultiplier)) - minSpeed) / (maxSpeed - minSpeed);
 
 		//speed evolution:
 		if (poly.speedEvolution == EVOLUTION.CURVE_ON_LIFETIME)
