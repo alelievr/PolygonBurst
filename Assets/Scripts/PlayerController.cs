@@ -31,4 +31,10 @@ public class PlayerController : MonoBehaviour {
 		float z = Mathf.Atan2(mouseDiff.x, mouseDiff.y) * Mathf.Rad2Deg;
 		transform.rotation = Quaternion.Euler(0, 0, -z);
 	}
+
+	void OnTriggerEnter2D(Collider2D c)
+	{
+		Debug.Log("player hitted !");
+		//life--
+	}
 }

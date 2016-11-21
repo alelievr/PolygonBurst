@@ -6,9 +6,12 @@ public class EmitterManager {
 	PolygonEmitter			e;
 	int						currentSpawnPattern = 0;
 	int						currentPatternCount = 0;
+	GameObject				emitterObject;
 
 	public void LoadEmitter (PolygonEmitter emitter) {
+		emitterObject = new GameObject("emitter");
 		e = emitter;
+		e.patterns.ForEach(sp => sp.spawnPattern.attachedGameObject = emitterObject);
 	}
 
 	public bool isFinished()

@@ -68,8 +68,11 @@ public class PolygonSpawnPattern : ScriptableObject {
 		//iterator over all to-spawn polygons of the frame and returned it once spawned
 		foreach (var sp in pattern.GetNextSpawnInfo())
 		{
-			Vector3 direction = emitterRotation * sp.direction;
-			Vector3 position = emitterRotation * sp.position;
+			if (!attachedGameObject.activeSelf && attachedGameObject == null)
+				break ;
+			Quaternion parentRotation = attachedGameObject.transform.rotation;
+			Vector3 direction = parentRotation * emitterRotation * sp.direction;
+			Vector3 position = emitterRotation * (parentRotation * sp.position);
 			position += attachedGameObject.transform.position;
 			GameObject go = GameObject.Instantiate(
 				spawnableObjects[0],
