@@ -9,8 +9,10 @@ public class EmitterManager {
 	GameObject				emitterObject;
 
 	public void LoadEmitter (PolygonEmitter emitter) {
-		emitterObject = new GameObject("emitter");
 		e = emitter;
+
+		emitterObject = GameObject.Instantiate(e.visualObject, e.position, Quaternion.identity) as GameObject;
+		emitterObject.transform.localScale *= e.scale;
 		e.patterns.ForEach(sp => sp.spawnPattern.attachedGameObject = emitterObject);
 	}
 

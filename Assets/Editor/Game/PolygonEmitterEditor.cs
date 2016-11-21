@@ -75,6 +75,8 @@ public class PolygonEmitterEditor : Editor {
 		emitter.name = EditorGUILayout.TextField("name", emitter.name);
 		emitter.life = EditorGUILayout.IntField("life points", (int)emitter.life);
 		emitter.spwanAt = EditorGUILayout.FloatField("spawn at", emitter.spwanAt);
+		emitter.visualObject = (GameObject)EditorGUILayout.ObjectField("visual", emitter.visualObject, typeof(GameObject), false);
+		emitter.scale = EditorGUILayout.FloatField("object scale", emitter.scale);
 
 		EditorGUILayout.Space();
 

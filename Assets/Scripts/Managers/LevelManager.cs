@@ -26,7 +26,7 @@ public class LevelManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (stage == null)
+		if (stage == null || stageManager == null)
 			return ;
 		// if (stageManagers[stageIndex].isFinished())
 		// {
