@@ -46,9 +46,39 @@ public class HilbertCurve {
 		}
 	}
 
-	public static List< Vector2 > GetPath(HilbertTable table)
+	static List< Vector2 > GetPath(HilbertTable table, int startX, int startY, int size, int currentX, int currentY, List< Vector2 > ret)
 	{
-		List< Vector2 > ret = new List< Vector2 >();
+		if (currentX < startX || currentY < startY || currentX >= startX + size || currentY >= startY + size)
+			return ret;
+
+		ret.Add(new Vector2(currentX, currentY));
+		int lookingFor = table.table[currentX, currentY] + 1;
+		if (table.table[currentX + 1, currentY] == lookingFor)
+			return GetPath(table, startX, startY, size, currentX + 1, currentY, ret);
+		if (table.table[currentX - 1, currentY] == lookingFor)
+			return GetPath(table, startX, startY, size, currentX - 1, currentY, ret);
+		if (table.table[currentX, currentY + 1] == lookingFor)
+			return GetPath(table, startX, startY, size, currentX, currentY + 1, ret);
+		if (table.table[currentX, currentY - 1] == lookingFor)
+			return GetPath(table, startX, startY, size, currentX, currentY - 1, ret);
+		return ret;
+	}
+
+	public static List< Vector2 > GetPath(HilbertTable table, int checksize)
+	{
+		List< Vector2 > ret = null;
+		List< Vector2 > tmp = null;
+		int				startX = Random.Range(1, table.size - checksize);
+		int				startY = Random.Range(1, table.size - checksize);
+
+		//path checking on hilbert curve
+		for (int x = 0; x < checksize; x++)
+		{
+			tmp = new List< Vector2 >();
+			tmp = GetPath(table, startX, startY, checksize, startX + x, startY + 0, tmp);
+			if (ret == null || tmp.Count > ret.Count)
+				ret = tmp;
+		}
 
 		return ret;
 	}
@@ -58,5 +88,4 @@ public class HilbertCurve {
 		public int[,]	table;
 		public int		size;
 	}
-
 }

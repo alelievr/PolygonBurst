@@ -15,7 +15,7 @@ public class FolowingCamera : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
 	
 		if (target == null)
 			return ;
