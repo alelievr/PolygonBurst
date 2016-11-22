@@ -64,21 +64,29 @@ public class HilbertCurve {
 		return ret;
 	}
 
-	public static List< Vector2 > GetPath(HilbertTable table, int checksize)
+	public static List< Vector2 > GetPath(HilbertTable table, int checksize, int max)
 	{
 		List< Vector2 > ret = null;
 		List< Vector2 > tmp = null;
-		int				startX = Random.Range(1, table.size - checksize);
-		int				startY = Random.Range(1, table.size - checksize);
+		int				r = Random.Range(0, table.size * table.size);
+
+		//find the position of r;
+		//get the path of r with max.
+
+		/*int				startX = Random.Range(1, table.size - checksize - 1);
+		int				startY = Random.Range(1, table.size - checksize - 1);
 
 		//path checking on hilbert curve
 		for (int x = 0; x < checksize; x++)
-		{
-			tmp = new List< Vector2 >();
-			tmp = GetPath(table, startX, startY, checksize, startX + x, startY + 0, tmp);
-			if (ret == null || tmp.Count > ret.Count)
-				ret = tmp;
-		}
+			for (int y = 0; y < checksize; y++)
+				if (x == 0 || y == 0 || x == checksize - 1 || y == checksize - 1) //if on border
+				{
+					tmp = new List< Vector2 >();
+					tmp = GetPath(table, startX, startY, checksize, startX + x, startY + y, tmp);
+					if ((ret == null || tmp.Count > ret.Count) && tmp.Count <= max)
+						ret = tmp;
+				}*/
+		Debug.Log("path count: " + ret.Count);
 
 		return ret;
 	}

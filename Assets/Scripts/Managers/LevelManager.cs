@@ -17,11 +17,11 @@ public class LevelManager : MonoBehaviour {
 		stageManager = manager;
 		
 		//Generate map:
-		var hilbert = HilbertCurve.GenerateHilbert(3);
+		var hilbert = HilbertCurve.GenerateHilbert(5);
 		HilbertCurve.Print(hilbert);
-		var path = HilbertCurve.GetPath(hilbert, 5);
+		var path = HilbertCurve.GetPath(hilbert, 10, 20);
 
-		//TODO: generate map with path
+		ProceduralMap.GenerateMap(path);
 	}
 	
 	// Update is called once per frame
@@ -37,5 +37,4 @@ public class LevelManager : MonoBehaviour {
 		// 	stageManagers[stageIndex].StageFrame();
 		stageManager.StageFrame();
 	}
-	
 }
