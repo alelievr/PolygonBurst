@@ -46,34 +46,36 @@ public class HilbertCurve {
 		}
 	}
 
-	static List< Vector2 > GetPath(HilbertTable table, int startX, int startY, int size, int currentX, int currentY, List< Vector2 > ret)
+	static List< Vector2 > GetPath(HilbertTable table, int startX, int startY, int size, int currentX, int currentY, int max, List< Vector2 > ret)
 	{
 		if (currentX < startX || currentY < startY || currentX >= startX + size || currentY >= startY + size)
 			return ret;
 
+		if (ret.Count >= max)
+			return ret;
 		ret.Add(new Vector2(currentX, currentY));
 		int lookingFor = table.table[currentX, currentY] + 1;
 		if (table.table[currentX + 1, currentY] == lookingFor)
-			return GetPath(table, startX, startY, size, currentX + 1, currentY, ret);
+			return GetPath(table, startX, startY, size, currentX + 1, currentY, max, ret);
 		if (table.table[currentX - 1, currentY] == lookingFor)
-			return GetPath(table, startX, startY, size, currentX - 1, currentY, ret);
+			return GetPath(table, startX, startY, size, currentX - 1, currentY, max, ret);
 		if (table.table[currentX, currentY + 1] == lookingFor)
-			return GetPath(table, startX, startY, size, currentX, currentY + 1, ret);
+			return GetPath(table, startX, startY, size, currentX, currentY + 1, max, ret);
 		if (table.table[currentX, currentY - 1] == lookingFor)
-			return GetPath(table, startX, startY, size, currentX, currentY - 1, ret);
+			return GetPath(table, startX, startY, size, currentX, currentY - 1, max, ret);
 		return ret;
 	}
 
-	public static List< Vector2 > GetPath(HilbertTable table, int checksize, int max)
+	public static List< Vector2 > GetPath(HilbertTable table, int checksize, int min, int max)
 	{
 		List< Vector2 > ret = null;
 		List< Vector2 > tmp = null;
-		int				r = Random.Range(0, table.size * table.size);
+		// int				r = Random.Range(0, table.size * table.size);
 
 		//find the position of r;
 		//get the path of r with max.
 
-		/*int				startX = Random.Range(1, table.size - checksize - 1);
+		int				startX = Random.Range(1, table.size - checksize - 1);
 		int				startY = Random.Range(1, table.size - checksize - 1);
 
 		//path checking on hilbert curve
@@ -82,11 +84,12 @@ public class HilbertCurve {
 				if (x == 0 || y == 0 || x == checksize - 1 || y == checksize - 1) //if on border
 				{
 					tmp = new List< Vector2 >();
-					tmp = GetPath(table, startX, startY, checksize, startX + x, startY + y, tmp);
-					if ((ret == null || tmp.Count > ret.Count) && tmp.Count <= max)
+					tmp = GetPath(table, startX, startY, checksize, startX + x, startY + y, max, tmp);
+					if (ret == null || tmp.Count > ret.Count)
 						ret = tmp;
-				}*/
-		Debug.Log("path count: " + ret.Count);
+					if (ret.Count >= min)
+						return ret;
+				}
 
 		return ret;
 	}
