@@ -19,9 +19,7 @@ public class LevelManager : MonoBehaviour {
 		//Generate map:
 		var hilbert = HilbertCurve.GenerateHilbert(6);
 		// HilbertCurve.Print(hilbert);
-		// var path = HilbertCurve.GetPath(hilbert, 10, Random.Range(8, 15), Random.Range(15, 23));
-		var path = HilbertCurve.GetPath(hilbert, 10, 2, 2);
-
+		var path = HilbertCurve.GetPath(hilbert, 10, Random.Range(8, 15), Random.Range(15, 23));
 		ProceduralMap.GenerateMap(path, 3);
 	}
 	
