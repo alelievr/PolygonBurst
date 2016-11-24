@@ -20,7 +20,7 @@ public class LevelManager : MonoBehaviour {
 		var hilbert = HilbertCurve.GenerateHilbert(6);
 		// HilbertCurve.Print(hilbert);
 		// var path = HilbertCurve.GetPath(hilbert, 10, Random.Range(8, 15), Random.Range(15, 23));
-		var path = HilbertCurve.GetPath(hilbert, 3, 2, 2);
+		var path = HilbertCurve.GetPath(hilbert, 10, 2, 2);
 
 		ProceduralMap.GenerateMap(path, 3);
 	}
@@ -36,6 +36,13 @@ public class LevelManager : MonoBehaviour {
 		// }
 		// else
 		// 	stageManagers[stageIndex].StageFrame();
+		if (Input.GetKeyDown(KeyCode.R))
+		{
+			var hilbert = HilbertCurve.GenerateHilbert(6);
+			var path = HilbertCurve.GetPath(hilbert, 10, Random.Range(8, 15), Random.Range(15, 23));
+
+			ProceduralMap.GenerateMap(path, 3);
+		}
 		stageManager.StageFrame();
 	}
 }

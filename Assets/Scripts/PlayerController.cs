@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour {
 	public Vector2					maxSpeed = Vector2.one * 8;
 	public Vector2					spawnOffset =  Vector2.one;
 	public PolygonSpawnPattern		projectileSpawnPattern;
+	public const string				playerBulletTag = "PlayerBullets";
 
 	Rigidbody2D						rbody;
 
@@ -19,7 +20,7 @@ public class PlayerController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		projectileSpawnPattern.InstanciateFramePolygons();
+		projectileSpawnPattern.InstanciateFramePolygons(playerBulletTag);
 	}
 
 	void FixedUpdate() {
@@ -36,9 +37,10 @@ public class PlayerController : MonoBehaviour {
 		transform.rotation = Quaternion.Euler(0, 0, -z);
 	}
 
-	void OnTriggerEnter2D(Collider2D c)
+	void OnTriggerStay2D(Collider2D c)
 	{
-		Debug.Log("player hitted !");
+		if (c.tag != playerBulletTag)
+			Debug.Log("player hitted !");
 		//life--
 	}
 }

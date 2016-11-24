@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
 public static class Utils {
 
@@ -19,5 +19,18 @@ public static class Utils {
 		if(angle < 0)
 			angle = 360 + angle;
 		return angle;
+	}
+
+	public static bool PolygonContainsPoint(List< Vector2 > poly, Vector2 point)
+	{
+		Bounds polyBounds = new Bounds();
+
+		polyBounds.min = Vector2.one * 1000000;
+		polyBounds.max = -Vector2.one * 1000000;
+		poly.ForEach(v => {
+			polyBounds.min = Vector3.Min(polyBounds.min, v);
+			polyBounds.max = Vector3.Min(polyBounds.min, v);
+		});
+		return polyBounds.Contains(point);
 	}
 }

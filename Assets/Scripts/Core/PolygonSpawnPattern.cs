@@ -47,7 +47,7 @@ public class PolygonSpawnPattern : ScriptableObject {
 		emitterAngle = 0;
 	}
 
-	public void	InstanciateFramePolygons(Transform gParent = null)
+	public void	InstanciateFramePolygons(string tag = null, Transform gParent = null)
 	{
 		Quaternion emitterRotation = Quaternion.Euler(0, 0, emitterAngle);
 		emitterAngle += rotation;
@@ -79,6 +79,8 @@ public class PolygonSpawnPattern : ScriptableObject {
 				position,
 				Quaternion.FromToRotation(Vector3.up, direction)
 			) as GameObject;
+			if (tag != null)
+			go.tag = tag;
 			if (gParent != null)
 				go.transform.parent = gParent;
 			else

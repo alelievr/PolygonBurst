@@ -31,10 +31,11 @@ public class ProceduralMap  {
 	{
 		List< Vector2 > verts = new List< Vector2 >();
 
-		verts.Add(p + Vector2.zero);
-		verts.Add(p + Vector2.right);
-		verts.Add(p + Vector2.one);
-		verts.Add(p + Vector2.up);
+		Vector2 d = Vector2.one / 2;
+		verts.Add(p + Vector2.zero - d);
+		verts.Add(p + Vector2.right - d);
+		verts.Add(p + Vector2.one - d);
+		verts.Add(p + Vector2.up - d);
 		return verts;
 	}
 
@@ -42,13 +43,14 @@ public class ProceduralMap  {
 	{
 		List< Vector2 > verts = new List< Vector2 >();
 
+		Vector2 v = (from - to);
+		Vector2 right = new Vector2(-v.y, v.x) / Mathf.Sqrt(v.x * v.x + v.y * v.y) * .2f;
+		Vector2 left = new Vector2(-v.y, v.x) / Mathf.Sqrt(v.x * v.x + v.y * v.y) * -.2f;
 		Vector2 forward = (from - to).normalized;
-		var right = new Vector2(0, forward.y);
-		var left = -right;
-		verts.Add(to + right * .2f);
-		verts.Add(from + right * .2f);
-		verts.Add(from - right * .2f);
-		verts.Add(to - right * .2f);
+		verts.Add(to + right);
+		verts.Add(from + right);
+		verts.Add(from - right);
+		verts.Add(to - right);
 		return verts;
 	}
 
@@ -84,39 +86,95 @@ public class ProceduralMap  {
 		return m;
 	}
 
+	static bool GetEdgeIntersectionWithRoom(Room nextRoom, Room room, Segment edge, out int intersectID, out bool order, out Vector2 nearestIntersectionPoint)
+	{
+		bool	intersect = false;
+		int		k;
+		float	dst = 1e20f;
+
+		order = true;
+		nearestIntersectionPoint = Vector2.zero;
+		k = 0;
+		intersectID = 0;
+		foreach (var edge2 in nextRoom.GetEdges()) //foreach edges of next room
+		{
+			Vector2 outPoint;
+			if (edge.Intersects(edge2, out outPoint))
+			{
+				float tmpDst = Vector2.Distance(edge.start, outPoint);
+				if (tmpDst < dst)
+				{
+					dst = tmpDst;
+					nearestIntersectionPoint = outPoint;
+					order = (Utils.PolygonContainsPoint(room.vertices, edge.start)) ? true : false;
+					if (room.type == ROOM_TYPE.CORRIDOR)
+					{
+						order = !order;
+						k++;
+					}
+					intersectID = k;
+				}
+				intersect = true;
+				//determine the iteration order for the next polygon
+			}
+			k++;
+		}	
+		if (!intersect)
+			intersectID = 0;
+		return intersect;
+	}
+
 	static List< Vector2 > GeneratePolygonVertices(Map map)
 	{
 		// bool			firstRoom = true;
 		List< Vector2 >	mergedVertices = new List< Vector2 >();
+		Vector2 nearestIntersectionPoint = Vector2.zero;
 		int i = 0;
+		int	j = 0;
+		int	inc = 1;
+		int	intersectID = 0;
+		bool order = true;
+		bool intersect = false;
 
 		while (true)
 		{
-			if (i == map.rooms.Count)
-				break ;
 			var room = map.rooms[i];
-			var nextRoom = (i == map.rooms.Count - 1) ? null : map.rooms[i + 1];
-			foreach (var edge in room.GetEdges()) //foreach edges of room / corridor
+			if (i == map.rooms.Count - 1)
+				inc = -1;
+			var nextRoom = (i == 0 && inc == -1) ? null : map.rooms[i + inc];
+			j = 0;
+			Debug.Log("parkouring poly " + i + " in order: " + order);
+			foreach (var edge in room.GetEdges(intersectID, order, (intersect) ? 1 : 0, (nextRoom == null) ? true : false)) //foreach edges of room / corridor
 			{
-				mergedVertices.Add(edge.start);
-				if (nextRoom == null) //if last room continue
-					continue ;
-				bool intersect = false;
-				foreach (var edge2 in nextRoom.GetEdges()) //foreach edges of next room
+				if (intersect && nextRoom != null)
 				{
 					Vector2 outPoint;
-					if (edge.Intersects(edge2, out outPoint))
+					Segment oldSegment = new Segment(nearestIntersectionPoint, edge.start);
+					if (GetEdgeIntersectionWithRoom(nextRoom, room, oldSegment, out intersectID, out order, out outPoint))
 					{
+						//FIXME
 						mergedVertices.Add(outPoint);
-						intersect = true;
 						break ;
 					}
 				}
+				Debug.Log("added vertice from poly " + i + " vertIndex: " + (j - 1));
+				mergedVertices.Add(edge.start);
+				if (nextRoom == null) //if last room do not check intersections
+					continue ;
+				intersect = false;
+				intersect = GetEdgeIntersectionWithRoom(nextRoom, room, edge, out intersectID, out order, out nearestIntersectionPoint);
 				if (intersect)
+				{
+					Debug.Log("breaked at poly " + i + ", intersect with " + (i + inc) + " at vert " + intersectID);
+					mergedVertices.Add(nearestIntersectionPoint);
 					break ;
+				}
 			}
-			i++;
+			i += inc;
+		if (i == -1)
+			break ;
 		}
+		map.finalVertices = mergedVertices;
 		return mergedVertices;
 	}
 
@@ -176,6 +234,8 @@ public class ProceduralMap  {
 	public class Map
 	{
 		public List< Room > rooms = new List< Room >();
+		public List< Vector2 > finalVertices;
+		public List< Segment > debugSegments = new List< Segment >();
 	}
 
 	public class Room
@@ -184,12 +244,33 @@ public class ProceduralMap  {
 		public ROOM_TYPE		type;
 		public List< Vector2 >	vertices;
 
-		public IEnumerable< Segment > GetEdges()
+		public IEnumerable< Segment > GetEdges(int beginOffset = 0, bool order = true, int additionalIterations = 0, bool stopAtZero = false)
 		{
-			int i;
-			for (i = 0; i < vertices.Count - 1; i++)
-				yield return new Segment(vertices[i], vertices[i + 1]);
-			yield return new Segment(vertices[vertices.Count - 1], vertices[0]);
+			int i, j, j1;
+			if (order)
+			{
+				for (i = beginOffset; i < vertices.Count + beginOffset + additionalIterations; i++)
+				{
+					j = i % vertices.Count;
+					j1 = (i + 1) % vertices.Count;
+					if (stopAtZero && j == 0)
+						break ;
+					yield return new Segment(vertices[j], vertices[j1]);
+				}
+			}
+			else
+			{
+				for (i = vertices.Count - beginOffset; i > -beginOffset - additionalIterations; i--)
+				{
+					j = (i % vertices.Count);
+					j1 =(i - 1) % vertices.Count;
+					j = (j < 0) ? j + vertices.Count : j;
+					j1 = (j1 < 0) ? j1 + vertices.Count : j1;
+					if (stopAtZero && j == 0)
+						break ;
+					yield return new Segment(vertices[j], vertices[j1]);
+				}
+			}
 		}
 	}
 
