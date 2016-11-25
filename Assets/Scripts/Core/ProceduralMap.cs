@@ -118,6 +118,7 @@ public class ProceduralMap  {
 		// bool			firstRoom = true;
 		List< Vector2 >	mergedVertices = new List< Vector2 >();
 		Vector2 nearestIntersectionPoint = Vector2.zero;
+		Vector2 minVertice = Vector2.one * 1e20f;
 		int i = 0;
 		int	inc = 1;
 		int	intersectID = 0;
@@ -140,11 +141,21 @@ public class ProceduralMap  {
 					Segment oldSegment = new Segment(nearestIntersectionPoint, edge.start);
 					if (GetEdgeIntersectionWithRoom(nextRoom, room, oldSegment, out intersectID, out order, out outPoint))
 					{
+						if (outPoint.x < minVertice.x)
+						{
+							minVertice.x = outPoint.x;
+							map.minVerticeIndex = mergedVertices.Count;
+						}
 						mergedVertices.Add(outPoint);
 						break ;
 					}
 				}
 				// Debug.Log("added vertice from poly " + i + " vertIndex: " + (j - 1));
+				if (edge.start.x < minVertice.x)
+				{
+					minVertice.x = edge.start.x;
+					map.minVerticeIndex = mergedVertices.Count;
+				}
 				mergedVertices.Add(edge.start);
 				if (nextRoom == null) //if last room do not check intersections
 					continue ;
@@ -153,6 +164,11 @@ public class ProceduralMap  {
 				if (intersect)
 				{
 					// Debug.Log("breaked at poly " + i + ", intersect with " + (i + inc) + " at vert " + intersectID);
+					if (nearestIntersectionPoint.x < minVertice.x)
+					{
+						minVertice.x = nearestIntersectionPoint.x;
+						map.minVerticeIndex = mergedVertices.Count;
+					}					
 					mergedVertices.Add(nearestIntersectionPoint);
 					break ;
 				}
@@ -163,6 +179,22 @@ public class ProceduralMap  {
 		}
 		map.finalVertices = mergedVertices;
 		return mergedVertices;
+	}
+
+	static void Outsidizator(Map map)
+	{
+		Vector2 minV = map.finalVertices[map.minVerticeIndex];
+		map.finalVertices.Insert(map.minVerticeIndex + 0, minV + Vector2.up * 0.00001f);
+		map.finalVertices.Insert(map.minVerticeIndex + 1, new Vector2(0, minV.y + 0.00001f));
+		map.finalVertices.Insert(map.minVerticeIndex + 2, Vector2.up * 300);
+		map.finalVertices.Insert(map.minVerticeIndex + 3, Vector2.one * 300);
+		map.finalVertices.Insert(map.minVerticeIndex + 4, Vector2.right * 300);
+		map.finalVertices.Insert(map.minVerticeIndex + 5, Vector2.zero);
+		map.finalVertices.Insert(map.minVerticeIndex + 6, new Vector2(0, minV.y));
+		// map.finalVertices.Insert(map.minVerticeIndex + 2, Vector2.one * 300);
+		// map.finalVertices.Insert(map.minVerticeIndex + 1, Vector2.up * 300);
+		// map.finalVertices.Insert(map.minVerticeIndex + 4, Vector2.zero);
+		// map.finalVertices.Insert(map.minVerticeIndex + 5, minV);
 	}
 
 	public static void GenerateMap(List< Vector2 > path, int bossNumber)
@@ -182,6 +214,9 @@ public class ProceduralMap  {
 
 		//merge all generated polygons:
 		vertices2D = GeneratePolygonVertices(map);
+
+		//generate outside map with inside map vertices:
+		// Outsidizator(map);
 
 		Triangulator	tr = new Triangulator(vertices2D.ToArray());
 		vertices = vertices2D.ConvertAll< Vector3 >(e => { return (Vector3)e; } );
@@ -203,9 +238,10 @@ public class ProceduralMap  {
 
 	public class Map
 	{
-		public List< Room > rooms = new List< Room >();
-		public List< Vector2 > finalVertices;
-		public List< Segment > debugSegments = new List< Segment >();
+		public List< Room >		rooms = new List< Room >();
+		public List< Vector2 >	finalVertices;
+		public List< Segment >	debugSegments = new List< Segment >();
+		public int				minVerticeIndex = -1;
 	}
 
 	public class Room
