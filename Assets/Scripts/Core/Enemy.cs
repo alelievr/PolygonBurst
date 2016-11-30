@@ -34,8 +34,7 @@ public class Enemy : MonoBehaviour {
 	{
 		if (c.tag == PlayerController.playerBulletTag || c.tag == PlayerController.playerTag)
 		{
-			Debug.Log("boss health: " + life);
-			life -= 10;
+			// life -= 10;
 			Globals.currentBoss = this;
 		}
 	}

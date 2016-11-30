@@ -11,16 +11,34 @@ public class LevelManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		//fill stageManagers list
-		StageManager manager = new StageManager();
-		manager.LoadEmitters(stage);
-		stageManager = manager;
 		
 		//Generate map:
 		var hilbert = HilbertCurve.GenerateHilbert(6);
 		// HilbertCurve.Print(hilbert);
 		var path = HilbertCurve.GetPath(hilbert, 10, Random.Range(8, 15), Random.Range(15, 23));
-		ProceduralMap.GenerateMap(path, 3);
+		var map = ProceduralMap.GenerateMap(path, 3);
+
+		//place player and bosses:
+		SetupPositions(map);
+		
+		//fill stageManagers list
+		StageManager manager = new StageManager();
+		manager.LoadEmitters(stage);
+		stageManager = manager;
+	}
+
+	void	SetupPositions(ProceduralMap.Map map)
+	{
+		Globals.player.transform.position = map.rooms[0].position;
+		Camera.main.transform.position = map.rooms[0].position;
+
+		int		i = 1;
+		foreach (var boss in stage.emitters)
+		{
+			while (i < map.rooms.Count && map.rooms[i].type != ProceduralMap.ROOM_TYPE.BOSS_ROOM)
+				i++;
+			boss.position = map.rooms[i++].position;
+		}
 	}
 	
 	// Update is called once per frame

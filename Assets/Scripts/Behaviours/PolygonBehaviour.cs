@@ -20,6 +20,8 @@ public class PolygonBehaviour : MonoBehaviour {
 	float					maxSpeed = -1e10f;
 	float					minSpeed = 1e10f;
 
+	bool					notAwoken;
+
 	void OnEnable()
 	{
 		lastTickUpdated = 0;
@@ -34,6 +36,15 @@ public class PolygonBehaviour : MonoBehaviour {
 		{
 			enabled = false;
 			GameObject.Destroy(gameObject);
+		}
+	}
+
+	void		OnTriggerEnter2D(Collider2D c)
+	{
+		if (c.tag == "Map")
+		{
+			enabled = false;
+			Destroy(gameObject);
 		}
 	}
 
@@ -61,19 +72,26 @@ public class PolygonBehaviour : MonoBehaviour {
 		this.direction = direction;
 		initialDirection = direction;
 		transform.rotation = Quaternion.FromToRotation(Vector3.up, direction);
+		//scale:
 		if (p.scaleEvolution == EVOLUTION.CONSTANT)
 			transform.localScale = p.scale.x * Vector3.one;
 		else if (p.scaleEvolution == EVOLUTION.RANDOM_BETWEEN)
 			transform.localScale = Vector3.one * Random.Range(p.scale.x, p.scale.y);
+		//z:
 		if (p.zPositionEvolution == EVOLUTION.CONSTANT)
 			transform.position = new Vector3(transform.position.x, transform.position.y, p.zPosition.x);
 		else if (p.zPositionEvolution == EVOLUTION.RANDOM_BETWEEN)
 			transform.position = new Vector3(transform.position.x, transform.position.y, Random.Range(p.zPosition.x, p.zPosition.y));
+		//speed:
 		if (p.speedEvolution == EVOLUTION.CONSTANT)
 			speed = p.speedRandoms.x * p.speedMultiplier;
 		else if (p.speedEvolution == EVOLUTION.RANDOM_BETWEEN)
 			speed = Random.Range(p.speedRandoms.x, p.speedRandoms.y) * p.speedMultiplier;
 		FindSpeedBounds();
+
+		//color:
+		if (poly.colorEvolution == EVOLUTION.CONSTANT)
+			renderer.color = poly.color1;
 	}
 
 	void Start()
@@ -84,7 +102,7 @@ public class PolygonBehaviour : MonoBehaviour {
 
 	void Update()
 	{
-		if (!enabled)
+		if (!enabled || notAwoken)
 			return ;
 		//WARNING: DO NOT CHANGE poly ATTRIBUTES VALUES !
 

@@ -7,6 +7,8 @@ public class EmitterManager {
 	int						currentSpawnPattern = 0;
 	int						currentPatternCount = 0;
 	GameObject				emitterObject;
+	float					transitionTimeout = 0;
+	float					transitionTime = 0;
 
 	public void LoadEmitter (PolygonEmitter emitter) {
 		e = emitter;
@@ -15,6 +17,7 @@ public class EmitterManager {
 		emitterObject.transform.localScale *= e.scale;
 		Enemy enemy = emitterObject.GetComponent< Enemy >();
 		enemy.life = e.life;
+		enemy.name = e.name;
 		Debug.Log("life: " + e.life);
 		e.patterns.ForEach(sp => sp.spawnPattern.attachedGameObject = emitterObject);
 	}
@@ -27,15 +30,18 @@ public class EmitterManager {
 	}
 	
 	public void EmitterFrame () {
-		if (e.patterns.Count == 0)
+		if (e.patterns.Count == 0 || Time.realtimeSinceStartup < transitionTimeout + transitionTime)
 			return ;
 		if (currentSpawnPattern == e.patterns.Count)
 		{
 			currentSpawnPattern = 0;
 			currentPatternCount = 0;
 		}
+		e.patterns[currentSpawnPattern].spawnPattern.InstanciateFramePolygons();
 		if (e.patterns[currentSpawnPattern].spawnPattern.isFinished())
 		{
+			transitionTimeout = Time.realtimeSinceStartup;
+			transitionTime = e.patterns[currentSpawnPattern].delay / 1000;
 			if (currentPatternCount == e.patterns[currentSpawnPattern].repeat - 1)
 			{
 				currentSpawnPattern++;
@@ -44,7 +50,5 @@ public class EmitterManager {
 			else
 				currentPatternCount++;
 		}
-		else
-			e.patterns[currentSpawnPattern].spawnPattern.InstanciateFramePolygons();
 	}
 }

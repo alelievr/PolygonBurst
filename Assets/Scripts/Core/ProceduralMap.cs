@@ -1,4 +1,4 @@
-﻿#define PROCEDURAL_DEBUG
+﻿//#define PROCEDURAL_DEBUG
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,9 +52,9 @@ public class ProceduralMap  {
 		foreach (var point in path)
 		{
 			Room p = new Room();
-			p.type = ROOM_TYPE.BASIC_ROOM;
+			p.type = ROOM_TYPE.BOSS_ROOM;
 			p.position = point;
-			p.vertices = GenerateRoomVertices(point, p.type); //room shape generation here
+			p.vertices = GenerateRoomVertices(point, p.type);
 			m.rooms.Add(p);
 
 			i++;
@@ -68,7 +68,7 @@ public class ProceduralMap  {
 				Room c = new Room();
 				c.type = ROOM_TYPE.CORRIDOR;
 				c.position = path[i] + (point - path[i]) / 2;
-				c.vertices = GenerateCorridorVertices(point, path[i]);//set corridor shape
+				c.vertices = GenerateCorridorVertices(point, path[i]);
 				m.rooms.Add(c);
 			}
 		}
@@ -197,12 +197,13 @@ public class ProceduralMap  {
 		// map.finalVertices.Insert(map.minVerticeIndex + 5, minV);
 	}
 
-	public static void GenerateMap(List< Vector2 > path, int bossNumber)
+	public static Map GenerateMap(List< Vector2 > path, int bossNumber, float mapScale = 1)
 	{
 		GameObject		mapObject = new GameObject("map");
 		Mesh			mesh = new Mesh();
 		List< Vector3 >	vertices;
 		List< Vector2 >	vertices2D;
+		mapScale *= 8;
 
 		//randomize path:
 		path = path.Select(e => e * 5f + new Vector2(Random.value, Random.value) * 2).ToList();
@@ -224,15 +225,25 @@ public class ProceduralMap  {
 		mesh.RecalculateBounds();
 		mesh.RecalculateNormals();
 		mapObject.tag = "Map";
+		mapObject.transform.localScale = Vector3.one * mapScale;
 		mapObject.AddComponent< MeshFilter >().mesh = mesh;
 		mapObject.AddComponent< MeshRenderer >().material = Globals.spriteLitMaterial;
 		#if PROCEDURAL_DEBUG
 		mapObject.AddComponent< MapDebug >().sharedMap = map;
 		#endif
 
+		map.rooms.ForEach(e => e.position *= mapScale);
+
 		EdgeCollider2D edgeCollidder = mapObject.AddComponent< EdgeCollider2D >();
 		edgeCollidder.points = vertices2D.ToArray();
-		//TODO: add EdgeCollider with mesh datas
+
+		//add kinimatic rigidbody2d to map for bullet collisions:
+		Rigidbody2D rbody = mapObject.AddComponent< Rigidbody2D >();
+		rbody.isKinematic = true;
+		rbody.freezeRotation = true;
+		rbody.constraints = RigidbodyConstraints2D.FreezeAll;
+
+		return map;
 	}
 
 	public class Map

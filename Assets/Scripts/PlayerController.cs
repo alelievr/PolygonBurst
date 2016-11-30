@@ -11,11 +11,14 @@ public class PlayerController : MonoBehaviour {
 	public const string				playerBulletTag = "PlayerBullets";
 	public const string				playerTag = "Player";
 
+	Rigidbody2D						rbody;
+
 	// Use this for initialization
 	void Start () {
 		tag = playerTag;
 		projectileSpawnPattern.attachedGameObject = gameObject;
 		projectileSpawnPattern.maxObjects = -1;
+		rbody = GetComponent< Rigidbody2D >();
 	}
 	
 	// Update is called once per frame

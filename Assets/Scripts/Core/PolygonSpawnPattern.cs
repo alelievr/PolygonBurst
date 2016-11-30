@@ -105,6 +105,8 @@ public class PolygonSpawnPattern : ScriptableObject {
 
 	public bool isFinished()
 	{
+		if (spawnWaveNumber == -1)
+			return true;
 		return spawnedWaves == spawnWaveNumber;
 	}
 }

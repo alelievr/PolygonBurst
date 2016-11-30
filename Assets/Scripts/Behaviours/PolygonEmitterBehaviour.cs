@@ -10,6 +10,7 @@ public class PolygonEmitterBehaviour : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		manager = new EmitterManager();
+		emitter.position = transform.position;
 		manager.LoadEmitter(emitter);
 	}
 	
