@@ -72,10 +72,21 @@ public class PolygonEmitterEditor : Editor {
 
 	public override void OnInspectorGUI()
 	{
+		GUIStyle 	redText = new GUIStyle();
+		Collider2D	c;
+
+		redText.normal.textColor = Color.red;
 		emitter.name = EditorGUILayout.TextField("name", emitter.name);
 		emitter.life = EditorGUILayout.IntField("life points", (int)emitter.life);
 		emitter.spwanAt = EditorGUILayout.FloatField("spawn at", emitter.spwanAt);
 		emitter.visualObject = (GameObject)EditorGUILayout.ObjectField("visual", emitter.visualObject, typeof(GameObject), false);
+		if (emitter.visualObject != null)
+		{
+			if (emitter.visualObject.GetComponent< Enemy >() == null)
+				EditorGUILayout.LabelField("visual object require the Enemy script as component !", redText);
+			if ((c = emitter.visualObject.GetComponent< Collider2D >()) == null || c.isTrigger == false)
+				EditorGUILayout.LabelField("visual object require a collider2D in trigger mode !", redText);
+		}
 		emitter.scale = EditorGUILayout.FloatField("object scale", emitter.scale);
 
 		EditorGUILayout.Space();

@@ -8,7 +8,7 @@ public class PolygonEmitter : ScriptableObject {
 	public float						life;
 	public float						spwanAt;
 	public GameObject					visualObject;
-	public float						scale;
+	public float						scale = 1;
 	//emitter loop over spawn patterns and once finished restart until death.
 	public List< PolygonPatternTransition >	patterns = new List< PolygonPatternTransition >();
 

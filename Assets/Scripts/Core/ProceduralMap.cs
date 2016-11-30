@@ -203,11 +203,9 @@ public class ProceduralMap  {
 		Mesh			mesh = new Mesh();
 		List< Vector3 >	vertices;
 		List< Vector2 >	vertices2D;
-		List< Vector2 >	uvs = new List< Vector2 >();
-		List< int >		triangles = new List< int >();
 
 		//randomize path:
-		path = path.Select(e => e * 4f + new Vector2(Random.value, Random.value) * 2).ToList();
+		path = path.Select(e => e * 5f + new Vector2(Random.value, Random.value) * 2).ToList();
 
 		//generate map rooms and corridors
 		Map map = GenerateMapFromPath(path, bossNumber);
@@ -222,18 +220,19 @@ public class ProceduralMap  {
 		vertices = vertices2D.ConvertAll< Vector3 >(e => { return (Vector3)e; } );
 
 		mesh.SetVertices(vertices);
-		// mesh.SetUVs(0, uvs);
 		mesh.triangles = tr.Triangulate();
-		// mesh.SetTriangles(triangles, 0);
 		mesh.RecalculateBounds();
 		mesh.RecalculateNormals();
+		mapObject.tag = "Map";
 		mapObject.AddComponent< MeshFilter >().mesh = mesh;
-		mapObject.AddComponent< MeshRenderer >().material = new Material(Shader.Find("Sprites/Diffuse"));
+		mapObject.AddComponent< MeshRenderer >().material = Globals.spriteLitMaterial;
 		#if PROCEDURAL_DEBUG
 		mapObject.AddComponent< MapDebug >().sharedMap = map;
 		#endif
 
-		//TODO: add polygonCollider with mesh datas
+		EdgeCollider2D edgeCollidder = mapObject.AddComponent< EdgeCollider2D >();
+		edgeCollidder.points = vertices2D.ToArray();
+		//TODO: add EdgeCollider with mesh datas
 	}
 
 	public class Map

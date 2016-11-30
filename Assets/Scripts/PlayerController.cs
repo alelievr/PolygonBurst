@@ -3,19 +3,19 @@ using System.Collections;
 
 public class PlayerController : MonoBehaviour {
 
+	public float					life = 1500;
 	public float					speed = 5f;
 	public Vector2					maxSpeed = Vector2.one * 8;
 	public Vector2					spawnOffset =  Vector2.one;
 	public PolygonSpawnPattern		projectileSpawnPattern;
 	public const string				playerBulletTag = "PlayerBullets";
-
-	Rigidbody2D						rbody;
+	public const string				playerTag = "Player";
 
 	// Use this for initialization
 	void Start () {
+		tag = playerTag;
 		projectileSpawnPattern.attachedGameObject = gameObject;
 		projectileSpawnPattern.maxObjects = -1;
-		rbody = GetComponent< Rigidbody2D >();
 	}
 	
 	// Update is called once per frame
@@ -41,6 +41,7 @@ public class PlayerController : MonoBehaviour {
 	{
 		if (c.tag != playerBulletTag)
 			Debug.Log("player hitted !");
-		//life--
+		if (c.tag != "Map")
+			life -= 10;
 	}
 }

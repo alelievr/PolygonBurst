@@ -13,6 +13,9 @@ public class EmitterManager {
 
 		emitterObject = GameObject.Instantiate(e.visualObject, e.position, Quaternion.identity) as GameObject;
 		emitterObject.transform.localScale *= e.scale;
+		Enemy enemy = emitterObject.GetComponent< Enemy >();
+		enemy.life = e.life;
+		Debug.Log("life: " + e.life);
 		e.patterns.ForEach(sp => sp.spawnPattern.attachedGameObject = emitterObject);
 	}
 
