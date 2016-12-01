@@ -26,7 +26,7 @@ public class StageManager {
 
 	public void	StageFrame()
 	{
-		if (emitters.Count == 0)
+		if (emitters.Count == 0 || emitterIndex >= emitters.Count)
 			return ;
 		if (emitters[emitterIndex].isFinished())
 		{

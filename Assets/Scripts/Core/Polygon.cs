@@ -40,7 +40,6 @@ public class Polygon {
 	public float			timeScale = 1;
 	public bool				dontDestroyOnInvisible = false;
 	public float			lifeTime = -1;
-
 }
 
 public enum EVOLUTION

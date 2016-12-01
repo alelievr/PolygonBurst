@@ -89,7 +89,7 @@ public class PolygonSpawnPattern : ScriptableObject {
 			if (p == null)
 				p = go.AddComponent< PolygonBehaviour >();
 			//setup position, direction and rotation for polygon, other params will be set by polygon script
-			p.UpdateParams(direction, poly);
+			p.UpdateParams(direction, poly, attachedGameObject.tag);
 			spawnedObjectsCount++;
 			lastSpawnedObject = Time.realtimeSinceStartup;
 		}
@@ -105,8 +105,8 @@ public class PolygonSpawnPattern : ScriptableObject {
 
 	public bool isFinished()
 	{
-		if (spawnWaveNumber == -1)
+		//if (spawnWaveNumber == -1)
 			return true;
-		return spawnedWaves == spawnWaveNumber;
+		//return spawnedWaves == spawnWaveNumber;
 	}
 }

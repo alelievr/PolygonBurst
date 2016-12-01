@@ -3,6 +3,8 @@ using System.Collections;
 
 public class PolygonBehaviour : MonoBehaviour {
 
+	const float				scaleMultiplier = .1f;
+
 	public Polygon			poly;
 
 	float					speed;
@@ -20,7 +22,9 @@ public class PolygonBehaviour : MonoBehaviour {
 	float					maxSpeed = -1e10f;
 	float					minSpeed = 1e10f;
 
-	bool					notAwoken;
+	string					emitterTag;
+
+	Vector3					baseScale;
 
 	void OnEnable()
 	{
@@ -30,22 +34,25 @@ public class PolygonBehaviour : MonoBehaviour {
 		lifetime = 0;
 	}
 
+	void DestroySelf()
+	{
+		enabled = false;
+		Destroy(gameObject);
+	}
+
 	void OnBecameInvisible()
 	{
 		if (!poly.dontDestroyOnInvisible)
-		{
-			enabled = false;
-			GameObject.Destroy(gameObject);
-		}
+			DestroySelf();
 	}
 
 	void		OnTriggerEnter2D(Collider2D c)
 	{
+		if (emitterTag == PlayerController.playerTag && c.tag != PlayerController.playerBulletTag)
+			if (emitterTag == Enemy.enemyTag && c.tag == Enemy.enemyBulletTag)
+				DestroySelf();
 		if (c.tag == "Map")
-		{
-			enabled = false;
-			Destroy(gameObject);
-		}
+			DestroySelf();
 	}
 
 	void		FindSpeedBounds()
@@ -66,17 +73,19 @@ public class PolygonBehaviour : MonoBehaviour {
 		}
 	}
 
-	public void UpdateParams(Vector3 direction, Polygon p)
+	public void UpdateParams(Vector3 direction, Polygon p, string eTag)
 	{
+		emitterTag = eTag;
 		poly = p;
 		this.direction = direction;
 		initialDirection = direction;
+		baseScale = transform.localScale;
 		transform.rotation = Quaternion.FromToRotation(Vector3.up, direction);
 		//scale:
 		if (p.scaleEvolution == EVOLUTION.CONSTANT)
-			transform.localScale = p.scale.x * Vector3.one;
+			transform.localScale = p.scale.x * baseScale * scaleMultiplier;
 		else if (p.scaleEvolution == EVOLUTION.RANDOM_BETWEEN)
-			transform.localScale = Vector3.one * Random.Range(p.scale.x, p.scale.y);
+			transform.localScale = baseScale * Random.Range(p.scale.x, p.scale.y) * scaleMultiplier;
 		//z:
 		if (p.zPositionEvolution == EVOLUTION.CONSTANT)
 			transform.position = new Vector3(transform.position.x, transform.position.y, p.zPosition.x);
@@ -102,12 +111,12 @@ public class PolygonBehaviour : MonoBehaviour {
 
 	void Update()
 	{
-		if (!enabled || notAwoken)
+		if (!enabled)
 			return ;
 		//WARNING: DO NOT CHANGE poly ATTRIBUTES VALUES !
 
 		if (direction != Vector3.zero)
-			transform.position += direction * speed;
+			transform.position += direction * speed / 10;
 
 		if (poly.directionModifiers != 0)
 		{
@@ -128,11 +137,11 @@ public class PolygonBehaviour : MonoBehaviour {
 			direction = Quaternion.Euler(0, 0, clampedAngle) * direction;
 		}
 
-		float speedRate = ((speed * (1 / poly.speedMultiplier)) - minSpeed) / (maxSpeed - minSpeed);
+		float speedRate = ((speed * (1 / (poly.speedMultiplier * 10))) - minSpeed) / (maxSpeed - minSpeed);
 
 		//speed evolution:
 		if (poly.speedEvolution == EVOLUTION.CURVE_ON_LIFETIME)
-			speed = poly.speedCurve.Evaluate(lifetime) * poly.speedMultiplier;
+			speed = poly.speedCurve.Evaluate(lifetime);
 		if (poly.speedEvolution == EVOLUTION.CURVE_ON_SPEED)
 			speed = poly.speedCurve.Evaluate(speedRate) * poly.speedMultiplier;
 
@@ -147,9 +156,9 @@ public class PolygonBehaviour : MonoBehaviour {
 
 		//scale evolution:
 		if (poly.scaleEvolution == EVOLUTION.CURVE_ON_LIFETIME)
-			transform.localScale = Vector3.one * poly.scaleCurve.Evaluate(lifetime);
+			transform.localScale = baseScale * poly.scaleCurve.Evaluate(lifetime) * scaleMultiplier;
 		if (poly.scaleEvolution == EVOLUTION.CURVE_ON_SPEED)
-			transform.localScale = Vector3.one * poly.scaleCurve.Evaluate(speedRate);
+			transform.localScale = baseScale * poly.scaleCurve.Evaluate(speedRate) * scaleMultiplier;
 
 		//z position evolution:
 		if (poly.zPositionEvolution == EVOLUTION.CURVE_ON_LIFETIME)
@@ -157,7 +166,7 @@ public class PolygonBehaviour : MonoBehaviour {
 		if (poly.zPositionEvolution == EVOLUTION.CURVE_ON_SPEED)
 			transform.position = new Vector3(transform.position.x, transform.position.y, poly.zPositionCurve.Evaluate(speedRate));
 			
-		lifetime += 0.05f * poly.timeScale;
+		lifetime += 0.01f * poly.timeScale;
 		lastTickUpdated = Time.realtimeSinceStartup;
 		if (poly.lifeTime != -1 && Time.realtimeSinceStartup - spawnedTime > poly.lifeTime)
 		{

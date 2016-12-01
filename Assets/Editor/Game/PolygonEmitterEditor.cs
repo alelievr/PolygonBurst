@@ -80,6 +80,9 @@ public class PolygonEmitterEditor : Editor {
 		emitter.life = EditorGUILayout.IntField("life points", (int)emitter.life);
 		emitter.spwanAt = EditorGUILayout.FloatField("spawn at", emitter.spwanAt);
 		emitter.visualObject = (GameObject)EditorGUILayout.ObjectField("visual", emitter.visualObject, typeof(GameObject), false);
+		emitter.alwaysAwoken = EditorGUILayout.Toggle("always awoken", emitter.alwaysAwoken);
+		if (!emitter.alwaysAwoken)
+			emitter.awokenRange = EditorGUILayout.FloatField("awoken range", emitter.awokenRange);
 		if (emitter.visualObject != null)
 		{
 			if (emitter.visualObject.GetComponent< Enemy >() == null)

@@ -43,22 +43,10 @@ public class LevelManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (stage == null || stageManager == null)
+		if (stage == null || stageManager == null || Globals.gameWin)
 			return ;
-		// if (stageManagers[stageIndex].isFinished())
-		// {
-		// 	//TODO: transition
-		// 	stageIndex++;
-		// }
-		// else
-		// 	stageManagers[stageIndex].StageFrame();
-		if (Input.GetKeyDown(KeyCode.R))
-		{
-			var hilbert = HilbertCurve.GenerateHilbert(6);
-			var path = HilbertCurve.GetPath(hilbert, 10, Random.Range(8, 15), Random.Range(15, 23));
-
-			ProceduralMap.GenerateMap(path, 3);
-		}
+		if (stageManager.isFinished())
+			Globals.gameWin = true;
 		stageManager.StageFrame();
 	}
 }

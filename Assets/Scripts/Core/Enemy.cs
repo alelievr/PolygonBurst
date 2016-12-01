@@ -5,7 +5,10 @@ using System.Collections;
 public class Enemy : MonoBehaviour {
 
 	[HideInInspector]
-	public float		life = 2000;
+	public float			life = 2000;
+
+	public static string	enemyTag = "Enemy";
+	public static string	enemyBulletTag = "EnemyBullets";
 
 	[HideInInspector]
 	public float		lifePercent {
@@ -18,6 +21,7 @@ public class Enemy : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		gameObject.tag = enemyTag;
 		maxLife = life;
 	}
 	
@@ -34,7 +38,7 @@ public class Enemy : MonoBehaviour {
 	{
 		if (c.tag == PlayerController.playerBulletTag || c.tag == PlayerController.playerTag)
 		{
-			// life -= 10;
+			life -= 10;
 			Globals.currentBoss = this;
 		}
 	}

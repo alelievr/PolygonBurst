@@ -12,7 +12,7 @@ public class ProceduralMap  {
 		float			noiseScale = 0.05f;
 		int				nVertices = 40;
 		float			degPadd = (360f / nVertices);
-		float			deg = 0;
+		float			deg = 125;
 
 		float rx = Random.Range(1f, 1.5f);
 		float ry = Random.Range(1f, 1.5f);
@@ -181,22 +181,6 @@ public class ProceduralMap  {
 		return mergedVertices;
 	}
 
-	static void Outsidizator(Map map)
-	{
-		Vector2 minV = map.finalVertices[map.minVerticeIndex];
-		map.finalVertices.Insert(map.minVerticeIndex + 0, minV + Vector2.up * 0.00001f);
-		map.finalVertices.Insert(map.minVerticeIndex + 1, new Vector2(0, minV.y + 0.00001f));
-		map.finalVertices.Insert(map.minVerticeIndex + 2, Vector2.up * 300);
-		map.finalVertices.Insert(map.minVerticeIndex + 3, Vector2.one * 300);
-		map.finalVertices.Insert(map.minVerticeIndex + 4, Vector2.right * 300);
-		map.finalVertices.Insert(map.minVerticeIndex + 5, Vector2.zero);
-		map.finalVertices.Insert(map.minVerticeIndex + 6, new Vector2(0, minV.y));
-		// map.finalVertices.Insert(map.minVerticeIndex + 2, Vector2.one * 300);
-		// map.finalVertices.Insert(map.minVerticeIndex + 1, Vector2.up * 300);
-		// map.finalVertices.Insert(map.minVerticeIndex + 4, Vector2.zero);
-		// map.finalVertices.Insert(map.minVerticeIndex + 5, minV);
-	}
-
 	public static Map GenerateMap(List< Vector2 > path, int bossNumber, float mapScale = 1)
 	{
 		GameObject		mapObject = new GameObject("map");
@@ -213,9 +197,6 @@ public class ProceduralMap  {
 
 		//merge all generated polygons:
 		vertices2D = GeneratePolygonVertices(map);
-
-		//generate outside map with inside map vertices:
-		// Outsidizator(map);
 
 		Triangulator	tr = new Triangulator(vertices2D.ToArray());
 		vertices = vertices2D.ConvertAll< Vector3 >(e => { return (Vector3)e; } );

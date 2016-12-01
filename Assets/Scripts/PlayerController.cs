@@ -11,22 +11,39 @@ public class PlayerController : MonoBehaviour {
 	public const string				playerBulletTag = "PlayerBullets";
 	public const string				playerTag = "Player";
 
-	Rigidbody2D						rbody;
+	float							maxLife;
+	
+	[HideInInspector]
+	public float		lifePercent {
+		get {
+			return life / maxLife;
+		}
+	}
 
 	// Use this for initialization
 	void Start () {
+		maxLife = life;
 		tag = playerTag;
 		projectileSpawnPattern.attachedGameObject = gameObject;
 		projectileSpawnPattern.maxObjects = -1;
-		rbody = GetComponent< Rigidbody2D >();
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		projectileSpawnPattern.InstanciateFramePolygons(playerBulletTag);
+
+		if (life <= 0)
+			GameOver();
+	}
+
+	void	GameOver()
+	{
+		Globals.gameOver = true;
 	}
 
 	void FixedUpdate() {
+		if (Globals.gameOver || Globals.gameWin)
+			return ;
 		Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
 		input.x = Mathf.Clamp(input.x, -maxSpeed.x, maxSpeed.x);
@@ -42,9 +59,7 @@ public class PlayerController : MonoBehaviour {
 
 	void OnTriggerStay2D(Collider2D c)
 	{
-		if (c.tag != playerBulletTag)
-			Debug.Log("player hitted !");
-		if (c.tag != "Map")
+		if (c.tag != playerBulletTag && c.tag != "Map")
 			life -= 10;
 	}
 }
