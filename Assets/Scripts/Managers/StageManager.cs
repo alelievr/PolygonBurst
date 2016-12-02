@@ -9,10 +9,12 @@ public class StageManager {
 
 	public void LoadEmitters(PolygonStage stage)
 	{
+		int i = 0;
 		//load emitters and emitterManagers, dont forget to handle emitter repeat and delay ! (stored in PolygonStage)
 		transitionDelay = stage.transitionDelay;
 		foreach (var emitter in stage.emitters)
 		{
+			emitter.life = 3000 + i++ * 500;
 			EmitterManager em = new EmitterManager();
 			em.LoadEmitter(emitter);
 			emitters.Add(em);

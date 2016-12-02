@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		PlayerCollider.player = this;
 		maxLife = life;
 		tag = playerTag;
 		projectileSpawnPattern.attachedGameObject = gameObject;
@@ -30,6 +31,8 @@ public class PlayerController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if (Globals.gameWin || Globals.gameOver)
+			return ;
 		projectileSpawnPattern.InstanciateFramePolygons(playerBulletTag);
 
 		if (life <= 0)
@@ -44,22 +47,16 @@ public class PlayerController : MonoBehaviour {
 	void FixedUpdate() {
 		if (Globals.gameOver || Globals.gameWin)
 			return ;
-		Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+		Vector2 input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
 
 		input.x = Mathf.Clamp(input.x, -maxSpeed.x, maxSpeed.x);
 		input.y = Mathf.Clamp(input.y, -maxSpeed.y, maxSpeed.y);
 
-		transform.position += (Vector3)input.normalized * Time.fixedDeltaTime * speed;
+		transform.position += Vector3.ClampMagnitude(input, 1) * Time.fixedDeltaTime * speed;
 		// rbody.AddForce((Vector3)input.normalized * Time.fixedDeltaTime * speed);
 
 		Vector3 mouseDiff = (Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position).normalized;
 		float z = Mathf.Atan2(mouseDiff.x, mouseDiff.y) * Mathf.Rad2Deg;
 		transform.rotation = Quaternion.Euler(0, 0, -z);
-	}
-
-	void OnTriggerStay2D(Collider2D c)
-	{
-		if (c.tag != playerBulletTag && c.tag != "Map")
-			life -= 10;
 	}
 }

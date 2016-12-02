@@ -48,13 +48,18 @@ public class GameGUI : MonoBehaviour {
 		if (Globals.gameOver)
 			gameOver.SetActive(true);
 		if (Globals.gameOver && Input.GetKeyDown(KeyCode.Return))
+		{
 			Application.LoadLevel(Application.loadedLevel);
+			Globals.gameOver = false;
+			Globals.gameWin = false;
+		}
 		if (Globals.gameWin)
 			gameWin.SetActive(true);
 		if (Globals.gameWin && Input.GetKeyDown(KeyCode.Return))
 		{
-			
 			Application.LoadLevel(Application.loadedLevel);
+			Globals.gameOver = false;
+			Globals.gameWin = false;
 		}
 	}
 }

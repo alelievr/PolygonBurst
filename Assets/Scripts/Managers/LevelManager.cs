@@ -13,10 +13,13 @@ public class LevelManager : MonoBehaviour {
 	void Start () {
 		
 		//Generate map:
-		var hilbert = HilbertCurve.GenerateHilbert(6);
+		var hilbert = HilbertCurve.GenerateHilbert(7);
 		// HilbertCurve.Print(hilbert);
 		var path = HilbertCurve.GetPath(hilbert, 10, Random.Range(8, 15), Random.Range(15, 23));
 		var map = ProceduralMap.GenerateMap(path, 3);
+
+		//randomize boss order:
+		Utils.Shuffle(stage.emitters);
 
 		//place player and bosses:
 		SetupPositions(map);
