@@ -3,7 +3,8 @@ using System.Collections;
 
 public class PolygonBehaviour : MonoBehaviour {
 
-	const float				scaleMultiplier = .1f;
+	const float				scaleMultiplier = .05f;
+	const float				fps = 60;
 
 	public Polygon			poly;
 
@@ -17,7 +18,7 @@ public class PolygonBehaviour : MonoBehaviour {
 	float					lastTickUpdated;
 	float					randomTickTime = .2f;
 	float					spawnedTime;
-	Vector3					wantedDirection;
+	Quaternion				wantedDirection;
 
 	float					maxSpeed = -1e10f;
 	float					minSpeed = 1e10f;
@@ -66,6 +67,11 @@ public class PolygonBehaviour : MonoBehaviour {
 				maxSpeed = Mathf.Max(maxSpeed, k.value);
 			}
 		}
+		else if (poly.speedEvolution == EVOLUTION.RANDOM_BETWEEN)
+		{
+			minSpeed = poly.speedRandoms.x;
+			minSpeed = poly.speedRandoms.y;
+		}
 		else
 		{
 			minSpeed = speed;
@@ -78,9 +84,9 @@ public class PolygonBehaviour : MonoBehaviour {
 		emitterTag = eTag;
 		poly = p;
 		this.direction = direction;
-		initialDirection = direction;
 		baseScale = transform.localScale;
 		transform.rotation = Quaternion.FromToRotation(Vector3.up, direction);
+		initialDirection = direction;
 		//scale:
 		if (p.scaleEvolution == EVOLUTION.CONSTANT)
 			transform.localScale = p.scale.x * baseScale * scaleMultiplier;
@@ -115,33 +121,47 @@ public class PolygonBehaviour : MonoBehaviour {
 			return ;
 		//WARNING: DO NOT CHANGE poly ATTRIBUTES VALUES !
 
+		//time rate with skipped farmes
+		float tr = Time.deltaTime * fps;
 		if (direction != Vector3.zero)
-			transform.position += direction * speed / 10;
+			transform.position += direction * speed / 10 * tr;
 
 		if (poly.directionModifiers != 0)
 		{
 			if ((poly.directionModifiers & (1 << (int)DIRECTION_MODIFIER.CURVED)) != 0)
 			{
-				float angle = poly.directionCurve.Evaluate(lifetime) * .1f;
-				wantedDirection = Quaternion.Euler(0, 0, angle) * wantedDirection;
+				float angle = poly.directionCurve.Evaluate(lifetime) * .1f * tr;
+				wantedDirection = Quaternion.AngleAxis(angle, initialDirection);
 			}
 			if ((poly.directionModifiers & (1 << (int)DIRECTION_MODIFIER.RANDOM_BETWEEN)) != 0)
 			{
 				if (Time.realtimeSinceStartup - lastTickUpdated >= randomTickTime)
-					wantedDirection = Quaternion.Euler(0, 0, Random.Range(poly.directionRandom.x, poly.directionRandom.y)) * poly.direction;
+				{
+					float angle = Random.Range(poly.directionRandom.x, poly.directionRandom.y);
+					wantedDirection = Quaternion.FromToRotation(Vector3.up, Quaternion.Euler(0, 0, angle) * initialDirection);
+					lastTickUpdated = Time.realtimeSinceStartup;
+				}
 			}
 
 			//update direction with maxAngularVelocity and wantedDirection
-			float directionAngle = Vector3.Angle(direction, wantedDirection);
+			/*float directionAngle = Vector3.Angle(direction, wantedDirection);
+
 			float clampedAngle = Mathf.Clamp(directionAngle, -poly.directionMaxAngularVelocity, poly.directionMaxAngularVelocity);
-			direction = Quaternion.Euler(0, 0, clampedAngle) * direction;
+			Debug.Log("clamped angle: " + clampedAngle);
+			Debug.Log("polygon direction: " + direction);
+			direction = Quaternion.AngleAxis(clampedAngle, Vector3.up) * Vector3.up;
+			transform.rotation = Quaternion.Euler(direction);*/
+			Vector3 velocity = Vector3.zero;
+			//direction = Vector3.SmoothDamp(direction, wantedDirection, ref velocity, .3f, 1);
+			transform.rotation = Quaternion.Lerp(transform.rotation, wantedDirection, 1);
+			direction = transform.up;
 		}
 
 		float speedRate = ((speed * (1 / (poly.speedMultiplier * 10))) - minSpeed) / (maxSpeed - minSpeed);
 
 		//speed evolution:
 		if (poly.speedEvolution == EVOLUTION.CURVE_ON_LIFETIME)
-			speed = poly.speedCurve.Evaluate(lifetime);
+			speed = poly.speedCurve.Evaluate(lifetime) * poly.speedMultiplier;
 		if (poly.speedEvolution == EVOLUTION.CURVE_ON_SPEED)
 			speed = poly.speedCurve.Evaluate(speedRate) * poly.speedMultiplier;
 
@@ -166,8 +186,7 @@ public class PolygonBehaviour : MonoBehaviour {
 		if (poly.zPositionEvolution == EVOLUTION.CURVE_ON_SPEED)
 			transform.position = new Vector3(transform.position.x, transform.position.y, poly.zPositionCurve.Evaluate(speedRate));
 			
-		lifetime += 0.01f * poly.timeScale;
-		lastTickUpdated = Time.realtimeSinceStartup;
+		lifetime += 0.01f * poly.timeScale * tr;
 		if (poly.lifeTime != -1 && Time.realtimeSinceStartup - spawnedTime > poly.lifeTime)
 		{
 			enabled = false;

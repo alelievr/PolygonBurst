@@ -7,7 +7,7 @@ public class LevelManager : MonoBehaviour {
 	//public List< StageTransition > transitions = new List< StageTransition >();
 
 	// int						stageIndex = 0;
-	StageManager			stageManager;
+	StageManager				stageManager;
 
 	// Use this for initialization
 	void Start () {

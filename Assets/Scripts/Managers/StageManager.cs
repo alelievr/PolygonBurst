@@ -14,7 +14,7 @@ public class StageManager {
 		transitionDelay = stage.transitionDelay;
 		foreach (var emitter in stage.emitters)
 		{
-			emitter.life = 3000 + i++ * 500;
+			emitter.life = 4000 + i++ * 700;
 			EmitterManager em = new EmitterManager();
 			em.LoadEmitter(emitter);
 			emitters.Add(em);
