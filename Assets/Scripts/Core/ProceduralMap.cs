@@ -187,7 +187,7 @@ public class ProceduralMap  {
 		Mesh			mesh = new Mesh();
 		List< Vector3 >	vertices;
 		List< Vector2 >	vertices2D;
-		mapScale *= 8;
+		mapScale *= 8 * Camera.main.orthographicSize / 5;
 
 		//randomize path:
 		path = path.Select(e => e * 5f + new Vector2(Random.value, Random.value) * 2).ToList();

@@ -3,7 +3,7 @@ using System.Collections;
 
 public class PolygonBehaviour : MonoBehaviour {
 
-	const float				scaleMultiplier = .05f;
+	const float				scaleMultiplier = 1f;
 	const float				fps = 60;
 
 	public Polygon			poly;
@@ -19,6 +19,8 @@ public class PolygonBehaviour : MonoBehaviour {
 	float					randomTickTime = .2f;
 	float					spawnedTime;
 	Quaternion				wantedDirection;
+
+	Transform				selfGuidenTarget;
 
 	float					maxSpeed = -1e10f;
 	float					minSpeed = 1e10f;
@@ -37,8 +39,11 @@ public class PolygonBehaviour : MonoBehaviour {
 
 	void DestroySelf()
 	{
-		enabled = false;
-		Destroy(gameObject);
+		if (!poly.invincible)
+		{
+			enabled = false;
+			Destroy(gameObject);
+		}
 	}
 
 	void OnBecameInvisible()
@@ -49,9 +54,10 @@ public class PolygonBehaviour : MonoBehaviour {
 
 	void		OnTriggerEnter2D(Collider2D c)
 	{
-		if (emitterTag == PlayerController.playerTag && c.tag != PlayerController.playerBulletTag)
-			if (emitterTag == Enemy.enemyTag && c.tag == Enemy.enemyBulletTag)
-				DestroySelf();
+		if (emitterTag == PlayerController.playerTag && c.tag != PlayerController.playerBulletTag && c.tag != PlayerController.playerTag)
+			DestroySelf();
+		if (emitterTag == Enemy.enemyTag && c.tag == Enemy.enemyBulletTag && c.tag != Enemy.enemyTag)
+			DestroySelf();
 		if (c.tag == "Map")
 			DestroySelf();
 	}
@@ -86,6 +92,7 @@ public class PolygonBehaviour : MonoBehaviour {
 		this.direction = direction;
 		baseScale = transform.localScale;
 		transform.rotation = Quaternion.FromToRotation(Vector3.up, direction);
+		wantedDirection = transform.rotation;
 		initialDirection = direction;
 		//scale:
 		if (p.scaleEvolution == EVOLUTION.CONSTANT)
@@ -107,6 +114,11 @@ public class PolygonBehaviour : MonoBehaviour {
 		//color:
 		if (poly.colorEvolution == EVOLUTION.CONSTANT)
 			renderer.color = poly.color1;
+		
+		//self guided target
+		var t = GameObject.Find(poly.directionTargetName);
+		if (t != null)
+			selfGuidenTarget = t.transform;
 	}
 
 	void Start()
@@ -124,15 +136,10 @@ public class PolygonBehaviour : MonoBehaviour {
 		//time rate with skipped farmes
 		float tr = Time.deltaTime * fps;
 		if (direction != Vector3.zero)
-			transform.position += direction * speed / 10 * tr;
+			transform.position += direction * speed * tr;
 
 		if (poly.directionModifiers != 0)
 		{
-			if ((poly.directionModifiers & (1 << (int)DIRECTION_MODIFIER.CURVED)) != 0)
-			{
-				float angle = poly.directionCurve.Evaluate(lifetime) * .1f * tr;
-				wantedDirection = Quaternion.AngleAxis(angle, initialDirection);
-			}
 			if ((poly.directionModifiers & (1 << (int)DIRECTION_MODIFIER.RANDOM_BETWEEN)) != 0)
 			{
 				if (Time.realtimeSinceStartup - lastTickUpdated >= randomTickTime)
@@ -142,6 +149,21 @@ public class PolygonBehaviour : MonoBehaviour {
 					lastTickUpdated = Time.realtimeSinceStartup;
 				}
 			}
+			if ((poly.directionModifiers & (1 << (int)DIRECTION_MODIFIER.SELF_GUIDEN)) != 0)
+			{
+				if (selfGuidenTarget != null)
+				{
+					Vector3 relativePos = selfGuidenTarget.position - transform.position;
+				    float angle = Mathf.Atan2(relativePos.y, relativePos.x) * Mathf.Rad2Deg;
+					wantedDirection = Quaternion.AngleAxis(angle - 90f, Vector3.forward);
+					//interpolate between player direction and current diration
+					wantedDirection = Quaternion.Slerp(transform.rotation, wantedDirection, .07f);
+				}
+				else
+					wantedDirection = Quaternion.FromToRotation(Vector3.up, direction);
+			}
+			if ((poly.directionModifiers & (1 << (int)DIRECTION_MODIFIER.CURVED)) != 0)
+				wantedDirection *= Quaternion.Euler(0, 0, poly.directionCurve.Evaluate(lifetime));
 
 			//update direction with maxAngularVelocity and wantedDirection
 			/*float directionAngle = Vector3.Angle(direction, wantedDirection);
@@ -151,9 +173,10 @@ public class PolygonBehaviour : MonoBehaviour {
 			Debug.Log("polygon direction: " + direction);
 			direction = Quaternion.AngleAxis(clampedAngle, Vector3.up) * Vector3.up;
 			transform.rotation = Quaternion.Euler(direction);*/
-			Vector3 velocity = Vector3.zero;
+			//Vector3 velocity = Vector3.zero;
 			//direction = Vector3.SmoothDamp(direction, wantedDirection, ref velocity, .3f, 1);
-			transform.rotation = Quaternion.Lerp(transform.rotation, wantedDirection, 1);
+			// Debug.Log("wantedDirection: " + wantedDirection);
+			transform.rotation = Quaternion.Lerp(transform.rotation, wantedDirection, 1f);
 			direction = transform.up;
 		}
 

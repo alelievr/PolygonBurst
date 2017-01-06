@@ -4,14 +4,12 @@ using System.Collections.Generic;
 public class StageManager {
 
 	List< EmitterManager >	emitters = new List< EmitterManager >();
-	List< float >			transitionDelay;
 	int						emitterIndex = 0;
 
 	public void LoadEmitters(PolygonStage stage)
 	{
 		int i = 0;
 		//load emitters and emitterManagers, dont forget to handle emitter repeat and delay ! (stored in PolygonStage)
-		transitionDelay = stage.transitionDelay;
 		foreach (var emitter in stage.emitters)
 		{
 			emitter.life = 4000 + i++ * 700;

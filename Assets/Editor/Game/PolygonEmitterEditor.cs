@@ -74,8 +74,9 @@ public class PolygonEmitterEditor : Editor {
 	{
 		GUIStyle 	redText = new GUIStyle();
 		Collider2D	c;
-
 		redText.normal.textColor = Color.red;
+
+		//emitter settings
 		emitter.name = EditorGUILayout.TextField("name", emitter.name);
 		emitter.life = EditorGUILayout.IntField("life points", (int)emitter.life);
 		emitter.spwanAt = EditorGUILayout.FloatField("spawn at", emitter.spwanAt);
@@ -94,13 +95,18 @@ public class PolygonEmitterEditor : Editor {
 
 		EditorGUILayout.Space();
 
+		//first spawn pattern:
+		emitter.first = (PolygonSpawnPattern)EditorGUILayout.ObjectField("on spawn pattern", emitter.first, typeof(PolygonSpawnPattern), false);
+
+		//last spawn pattern:
+		emitter.last = (PolygonSpawnPattern)EditorGUILayout.ObjectField("on death pattern", emitter.last, typeof(PolygonSpawnPattern), false);
+
+		//default pattern list
 		serializedObject.Update();
         patternList.DoLayoutList();
         serializedObject.ApplyModifiedProperties();
 
 		if (GUI.changed) 
-        {
             EditorUtility.SetDirty(emitter);
-        }
 	}
 }

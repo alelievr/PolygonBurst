@@ -11,6 +11,7 @@ public class EmitterManager {
 	float					transitionTimeout = 0;
 	float					transitionTime = 0;
 	Enemy					enemy;
+	bool 					first = true;
 
 	public void LoadEmitter (PolygonEmitter emitter) {
 		e = emitter;
@@ -22,12 +23,21 @@ public class EmitterManager {
 		enemy.life = e.life;
 		enemy.name = e.name;
 		e.patterns.ForEach(sp => sp.spawnPattern.attachedGameObject = emitterObject);
+		if (e.first != null)
+			e.first.attachedGameObject = emitterObject;
+		if (e.last != null)
+		e.last.attachedGameObject = emitterObject;
 	}
 
 	public bool isFinished()
 	{
 		if (enemy.life <= 0)
+		{
 			Debug.Log("emitter " + enemy.name + " defeated");
+			if (e.last != null)
+				e.last.InstanciateFramePolygons(Enemy.enemyBulletTag);
+			Globals.PlayExplosion();
+		}
 		return enemy.life <= 0;
 	}
 	
@@ -37,6 +47,11 @@ public class EmitterManager {
 		//if emitter is not in range
 		if (!e.alwaysAwoken && Globals.player != null && Vector2.Distance(emitterObject.transform.position, Globals.player.transform.position) > e.awokenRange)
 			return ;
+		if (first && e.first != null)
+		{
+			e.first.InstanciateFramePolygons(Enemy.enemyBulletTag);
+			first = false;
+		}
 		if (e.patterns.Count == 0 || Time.realtimeSinceStartup < transitionTimeout + transitionTime)
 			return ;
 		if (currentSpawnPattern == e.patterns.Count)

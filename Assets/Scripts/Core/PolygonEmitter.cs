@@ -9,7 +9,7 @@ public class PolygonEmitter : ScriptableObject {
 	public float						spwanAt;
 	public GameObject					visualObject;
 	public float						scale = 1;
-	public float						awokenRange = 10;
+	public float						awokenRange = 80;
 	public bool							alwaysAwoken = false;
 	//emitter loop over spawn patterns and once finished restart until death.
 	//default pattern:
@@ -22,9 +22,9 @@ public class PolygonEmitter : ScriptableObject {
 	public float							patternSwitchLifePercent2;
 
 	//pattern executed when boss dies
-	PolygonPatternTransition				last;
+	public PolygonSpawnPattern				last;
 	//pattern executed when boss spawn
-	PolygonPatternTransition				first;
+	public PolygonSpawnPattern				first;
 
 	public Vector3						position;
 	public Quaternion					rotation;

@@ -10,8 +10,8 @@ public class Polygon {
 	//Color datas:
 	public EVOLUTION		colorEvolution = EVOLUTION.CONSTANT;
 	public Gradient			colorGradient;
-	public Color			color1;
-	public Color			color2;
+	public Color			color1 = Color.white;
+	public Color			color2 = Color.white;
 	public bool				colorLoop = false;
 
 	//speed datas:
@@ -40,6 +40,7 @@ public class Polygon {
 	public float			timeScale = 1;
 	public bool				dontDestroyOnInvisible = false;
 	public float			lifeTime = -1;
+	public bool				invincible = false;
 }
 
 public enum EVOLUTION

@@ -47,21 +47,21 @@ public class PolygonSpawnPattern : ScriptableObject {
 		emitterAngle = 0;
 	}
 
-	public void	InstanciateFramePolygons(string tag = null, Transform gParent = null)
+	public bool	InstanciateFramePolygons(string tag = null, Transform gParent = null)
 	{
 		Quaternion emitterRotation = Quaternion.Euler(0, 0, emitterAngle);
 		emitterAngle += rotation;
 		if (parent == null)
 			parent = new GameObject("poly parent");
 		if (spawnedObjectsCount >= maxObjects && maxObjects != -1)
-			return ;
+			return false;
 		float timing;
 		if (spawnedObjectInWaveCount == spawnWavePerCycle)
 			timing = spawnDelayBetweenWaves;
 		else
 			timing = spawnDelayInsideWaves;
 		if (Time.realtimeSinceStartup - lastSpawnedObject < timing / 1000)
-			return ;
+			return false;
 		if (spawnedObjectInWaveCount == spawnWavePerCycle)
 			spawnedObjectInWaveCount = 0;
 		//called each frame to spawn polygons if needed
@@ -72,7 +72,7 @@ public class PolygonSpawnPattern : ScriptableObject {
 				break ;
 			Quaternion parentRotation = attachedGameObject.transform.rotation;
 			Vector3 direction = parentRotation * emitterRotation * sp.direction;
-			Vector3 position = emitterRotation * (parentRotation * sp.position);
+			Vector3 position = emitterRotation * (parentRotation * sp.position) * pattern.spawnPatternSize;
 			position += attachedGameObject.transform.position;
 			GameObject go = GameObject.Instantiate(
 				spawnableObjects[0],
@@ -95,6 +95,7 @@ public class PolygonSpawnPattern : ScriptableObject {
 		}
 		spawnedObjectInWaveCount++;
 		spawnedWaves++;
+		return true;
 	}
 
 	public void OnDestroy()

@@ -10,8 +10,12 @@ public class PlayerController : MonoBehaviour {
 	public PolygonSpawnPattern		projectileSpawnPattern;
 	public const string				playerBulletTag = "PlayerBullets";
 	public const string				playerTag = "Player";
+	public AudioClip				playerShotClip;
+	public AudioClip[]				soundsList;
 
 	float							maxLife;
+	AudioSource						audioSource;
+	bool							godMode = false;
 	
 	[HideInInspector]
 	public float		lifePercent {
@@ -27,15 +31,23 @@ public class PlayerController : MonoBehaviour {
 		tag = playerTag;
 		projectileSpawnPattern.attachedGameObject = gameObject;
 		projectileSpawnPattern.maxObjects = -1;
+		audioSource = GetComponent< AudioSource >();
+		audioSource.clip = soundsList[Random.Range(0, soundsList.Length)];
+		audioSource.volume = .20f;
+		audioSource.Play();
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		if (Globals.gameWin || Globals.gameOver)
 			return ;
-		projectileSpawnPattern.InstanciateFramePolygons(playerBulletTag);
+		if (projectileSpawnPattern.InstanciateFramePolygons(playerBulletTag))
+			audioSource.PlayOneShot(playerShotClip, .05f);
 
-		if (life <= 0)
+		if (Input.GetKeyDown("g"))
+			godMode = !godMode;
+
+		if (!godMode && life <= 0)
 			GameOver();
 	}
 

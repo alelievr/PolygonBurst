@@ -184,7 +184,7 @@ public class PolygonSpawnPatternEditor : Editor {
 				p.zPositionCurve = EditorGUILayout.CurveField("z position curve", p.zPositionCurve);
 				break ;
 			case EVOLUTION.CONSTANT:
-				p.zPosition.x = EditorGUILayout.FloatField("speed", p.zPosition.x);
+				p.zPosition.x = EditorGUILayout.FloatField("z position", p.zPosition.x);
 				break ;
 			case EVOLUTION.RANDOM_BETWEEN:
 				p.zPosition = EditorGUILayout.Vector2Field("z between", p.zPosition);
@@ -196,6 +196,7 @@ public class PolygonSpawnPatternEditor : Editor {
 		p.timeScale = EditorGUILayout.FloatField("time scale multiplier", p.timeScale);
 		p.dontDestroyOnInvisible = EditorGUILayout.Toggle("dont destroy on invisible", p.dontDestroyOnInvisible);
 		p.lifeTime = EditorGUILayout.FloatField("max lifeTime", p.lifeTime);
+		p.invincible = EditorGUILayout.Toggle("invincible", p.invincible);
 	}
 
 	public override void OnInspectorGUI()
