@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
-using UnityEngine.SceneManagement;
+// using UnityEngine.SceneManagement;
 
 public class TitleScreen : MonoBehaviour {
 
@@ -29,6 +29,9 @@ public class TitleScreen : MonoBehaviour {
 		titleText.transform.localScale *= 1f + Mathf.Sin(Time.timeSinceLevelLoad * 3) / 300f;
 
 		if (Input.GetKeyDown(KeyCode.Return))
-			SceneManager.LoadScene("main");
+		{
+			// SceneManager.LoadScene("main");
+			Application.LoadLevel("main");
+		}
 	}
 }
