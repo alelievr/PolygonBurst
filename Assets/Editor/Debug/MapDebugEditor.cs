@@ -37,7 +37,7 @@ public class MapDebugEditor : Editor {
 					Handles.color = Color.green;
 				else
 					Handles.color = Color.red;
-				Handles.DotCap(0, room.position, Quaternion.identity, 0.04f);
+				Handles.DotHandleCap(0, room.position, Quaternion.identity, 0.04f, EventType.Repaint);
 				Handles.Label(room.position, i.ToString());
 				i++;
 			}
@@ -56,7 +56,7 @@ public class MapDebugEditor : Editor {
 				Debug.DrawLine(seg.start, seg.end, Color.yellow);
 				Handles.color = Color.yellow;
 				Handles.Label(seg.start + new Vector2(-1, 1) * .02f, i.ToString());
-				Handles.ArrowCap(0, seg.start, Quaternion.FromToRotation(Vector3.back, (seg.start - seg.end).normalized), 0.2f);
+				Handles.ArrowHandleCap(0, seg.start, Quaternion.FromToRotation(Vector3.back, (seg.start - seg.end).normalized), 0.2f, EventType.Repaint);
 				i++;
 			}
 		}

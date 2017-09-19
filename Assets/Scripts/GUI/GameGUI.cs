@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class GameGUI : MonoBehaviour {
 
@@ -49,7 +50,7 @@ public class GameGUI : MonoBehaviour {
 			gameOver.SetActive(true);
 		if (Globals.gameOver && Input.GetKeyDown(KeyCode.Return))
 		{
-			Application.LoadLevel(Application.loadedLevel);
+			SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 			Globals.gameOver = false;
 			Globals.gameWin = false;
 		}
@@ -57,7 +58,7 @@ public class GameGUI : MonoBehaviour {
 			gameWin.SetActive(true);
 		if (Globals.gameWin && Input.GetKeyDown(KeyCode.Return))
 		{
-			Application.LoadLevel(Application.loadedLevel);
+			SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 			Globals.gameOver = false;
 			Globals.gameWin = false;
 		}
