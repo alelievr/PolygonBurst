@@ -28,7 +28,7 @@ Here again i made a simple custom editor to simplify the creation of bosses:
 ## Post processing
 
 I used the excellent unity's [post processing stack](https://www.assetstore.unity3d.com/en/#!/content/83912) asset for all my effects.  
-Bloom, anti-aliasing, a bit of motion blur and chromatic aberation make the polygons more visible and the game much more beautiful.
+Bloom, anti-aliasing, a bit of motion blur and chromatic aberration make the polygons more visible and the game much more beautiful.
 
 ## Game screens:
 Boss 9:
